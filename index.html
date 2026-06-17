@@ -3,103 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JV CELL - Gestão Inteligente</title>
-    <!-- Tailwind CSS para Interface Moderna -->
+    <title>JV CELL - Gestão Avançada</title>
+    <!-- Tailwind CSS para Design de Aplicativo Premium -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Chart.js para os Gráficos -->
+    <!-- Chart.js para os Gráficos de Desempenho -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- jsPDF para Relatórios Avançados -->
+    <!-- jsPDF para a Emissão dos Recibos e Planilhas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans antialiased">
 
-    <!-- TELA DE LOGIN FIXA E SEGURA -->
-    <div id="loginScreen" class="fixed inset-0 bg-gray-900 flex flex-col items-center justify-center z-50 p-4">
+    <!-- TELA DE LOGIN PRIVADA -->
+    <div id="loginScreen" class="fixed inset-0 bg-slate-900 flex flex-col items-center justify-center z-50 p-4">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md space-y-6 border border-gray-100">
-            <div class="text-center">
-                <h1 class="text-3xl font-extrabold text-blue-600 tracking-wider">JV CELL</h1>
-                <p class="text-sm text-gray-500 mt-1">Controle de Assistência Técnica & Finanças</p>
+            <!-- ÍCONE DO APP CENTRALIZADO NO LOGIN -->
+            <div class="flex flex-col items-center justify-center mb-2">
+                <div class="w-24 h-24 bg-slate-900 rounded-2xl flex items-center justify-center p-2 shadow-xl border-2 border-blue-500 relative">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" class="w-full h-full">
+                        <rect x="50" y="20" width="140" height="200" rx="20" fill="#1e293b" stroke="#2563eb" stroke-width="6"/>
+                        <rect x="60" y="35" width="120" height="170" rx="10" fill="#0b0f19"/>
+                        <circle cx="120" cy="28" r="3" fill="#475569"/>
+                        <g stroke="#d97706" stroke-width="4" fill="none" opacity="0.6">
+                            <circle cx="120" cy="120" r="30" stroke-dasharray="10 6"/>
+                        </g>
+                        <path d="M70,170 L105,135" stroke="#f59e0b" stroke-width="7" stroke-linecap="round"/>
+                        <path d="M65,175 L75,165" stroke="#94a3b8" stroke-width="9" stroke-linecap="round"/>
+                        <text x="120" y="112" font-family="Arial, sans-serif" font-weight="900" font-size="32" fill="#ffffff" text-anchor="middle">JV</text>
+                        <text x="120" y="142" font-family="Arial, sans-serif" font-weight="900" font-size="26" fill="#60a5fa" text-anchor="middle">CEL</text>
+                    </svg>
+                    <span class="absolute -top-1 -right-1 flex h-4 w-4">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-4 w-4 bg-green-500"></span>
+                    </span>
+                </div>
+                <h1 class="text-3xl font-extrabold text-blue-600 tracking-wider mt-3">JV CELL</h1>
+                <p class="text-sm text-gray-500 mt-1">Gerenciamento Técnico & Lucros</p>
             </div>
+
             <form id="loginForm" onsubmit="autenticar(event)" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">E-mail de Acesso</label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">E-mail corporativo</label>
                     <input type="email" id="loginUser" required placeholder="jvcell@gmail.com" class="w-full p-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Senha</label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Senha de Acesso</label>
                     <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full p-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 <button type="submit" class="w-full bg-blue-600 text-white p-2.5 rounded-lg font-bold hover:bg-blue-700 transition shadow-md">
-                    Entrar no Sistema
+                    Entrar no Painel
                 </button>
             </form>
             <p id="loginErro" class="text-center text-sm text-red-600 font-bold hidden">E-mail ou senha incorretos!</p>
         </div>
     </div>
 
-    <!-- PAINEL OPERACIONAL PRINCIPAL -->
+    <!-- SISTEMA PRINCIPAL -->
     <div id="mainSystem" class="hidden">
         
-        <!-- BARRA DE NAVEGAÇÃO -->
+        <!-- HEADER / MENU SUPERIOR -->
         <nav class="bg-blue-600 text-white p-4 shadow-lg sticky top-0 z-40">
-            <div class="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-                <div class="flex items-center justify-between w-full md:w-auto">
-                    <h1 class="text-2xl font-black tracking-widest">JV CELL</h1>
-                    <button onclick="deslogar()" class="md:hidden text-xs bg-red-500 px-2 py-1 rounded font-bold">Sair</button>
+            <div class="container mx-auto flex flex-col lg:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3 justify-between w-full lg:w-auto">
+                    <div class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" class="w-10 h-10 drop-shadow-md">
+                            <rect x="50" y="20" width="140" height="200" rx="20" fill="#1e293b" stroke="#ffffff" stroke-width="6"/>
+                            <rect x="60" y="35" width="120" height="170" rx="10" fill="#0f172a"/>
+                            <path d="M75,165 L105,135" stroke="#f59e0b" stroke-width="6" stroke-linecap="round"/>
+                            <text x="120" y="115" font-family="Arial, sans-serif" font-weight="900" font-size="28" fill="#ffffff" text-anchor="middle">JV</text>
+                            <text x="120" y="142" font-family="Arial, sans-serif" font-weight="900" font-size="24" fill="#3b82f6" text-anchor="middle">CEL</text>
+                        </svg>
+                        <h1 class="text-xl font-black tracking-widest">JV CELL</h1>
+                    </div>
+                    <button onclick="deslogar()" class="lg:hidden text-xs bg-red-500 px-2 py-1 rounded font-bold">Sair</button>
                 </div>
-                <div class="flex flex-wrap gap-2 justify-center">
-                    <button onclick="showSection('dashboard')" class="nav-btn bg-blue-800 px-4 py-2 rounded-lg font-semibold transition">Início / Gráficos</button>
-                    <button onclick="showSection('clientes')" class="nav-btn px-4 py-2 rounded-lg font-semibold transition hover:bg-blue-700">Adicionar Clientes</button>
-                    <button onclick="showSection('os')" class="nav-btn px-4 py-2 rounded-lg font-semibold transition hover:bg-blue-700">Ordens de Serviço</button>
-                    <button onclick="showSection('planilha')" class="nav-btn px-4 py-2 rounded-lg font-semibold transition hover:bg-blue-700">Planilha de Desempenho</button>
-                    <button onclick="showSection('garantias')" class="nav-btn px-4 py-2 rounded-lg font-semibold transition hover:bg-blue-700">Garantias (3M)</button>
-                    <button onclick="deslogar()" class="hidden md:block bg-red-500 px-4 py-2 rounded-lg font-semibold hover:bg-red-600 transition shadow">Sair</button>
+                <div class="flex flex-wrap gap-1.5 justify-center">
+                    <button onclick="showSection('dashboard')" class="nav-btn bg-blue-800 px-3 py-2 rounded-lg text-sm font-semibold transition">Início / Gráficos</button>
+                    <button onclick="showSection('clientes')" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition hover:bg-blue-700">Adicionar Clientes</button>
+                    <button onclick="showSection('os')" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition hover:bg-blue-700">Ordens de Serviço</button>
+                    <button onclick="showSection('planilha')" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition hover:bg-blue-700">Planilha de Desempenho</button>
+                    <button onclick="showSection('garantias')" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition hover:bg-blue-700">Garantias (3M)</button>
+                    <button onclick="deslogar()" class="hidden lg:block bg-red-500 px-3 py-2 rounded-lg text-sm font-semibold hover:bg-red-600 transition shadow">Sair</button>
                 </div>
             </div>
         </nav>
 
         <div class="container mx-auto p-4 md:p-6 space-y-6">
 
-            <!-- ABA 1: RESUMO DIÁRIO E GRÁFICOS -->
+            <!-- ABA 1: DIÁRIO E GRÁFICOS -->
             <section id="dashboard" class="tab-content space-y-6">
                 <div class="border-b pb-2 flex justify-between items-center">
-                    <h2 class="text-xl font-bold text-gray-800">Painel de Resumos & Gráficos</h2>
-                    <span class="text-sm bg-blue-50 text-blue-600 font-bold px-3 py-1 rounded-full border border-blue-200">Visão Geral</span>
+                    <h2 class="text-xl font-bold text-gray-800">Resumo Automatizado (Hoje)</h2>
                 </div>
                 
-                <!-- Cards de Resumo Hoje Automatizado -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-green-500">
-                        <p class="text-xs text-gray-400 font-bold uppercase">Faturamento (Hoje)</p>
+                        <p class="text-xs text-gray-400 font-bold uppercase">Faturamento Diário</p>
                         <p id="fat-hoje" class="text-2xl font-bold text-gray-800">R$ 0,00</p>
                     </div>
                     <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-red-500">
-                        <p class="text-xs text-gray-400 font-bold uppercase">Custo de Peças (Hoje)</p>
+                        <p class="text-xs text-gray-400 font-bold uppercase">Custo de Peças Descontado</p>
                         <p id="custo-hoje" class="text-2xl font-bold text-gray-800">R$ 0,00</p>
                     </div>
                     <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-blue-500">
-                        <p class="text-xs text-gray-400 font-bold uppercase">Lucro Líquido (Hoje)</p>
+                        <p class="text-xs text-gray-400 font-bold uppercase">Lucro Líquido Real</p>
                         <p id="lucro-hoje" class="text-2xl font-bold text-blue-600">R$ 0,00</p>
                     </div>
                 </div>
 
-                <!-- Painel Visual de Gráficos -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                        <h3 class="text-sm font-bold text-gray-500 mb-4 uppercase tracking-wider">Histórico de Desempenho Diário (7 Dias)</h3>
+                        <h3 class="text-sm font-bold text-gray-500 mb-4 uppercase">Histórico Diário de Caixas (Últimos 7 dias)</h3>
                         <canvas id="chartDiario" class="w-full max-h-64"></canvas>
                     </div>
                     <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                        <h3 class="text-sm font-bold text-gray-500 mb-4 uppercase tracking-wider">Faturamento Consolidado Mensal</h3>
+                        <h3 class="text-sm font-bold text-gray-500 mb-4 uppercase">Faturamento Mensal Consolidado</h3>
                         <canvas id="chartMensal" class="w-full max-h-64"></canvas>
                     </div>
                 </div>
             </section>
 
 
-            <!-- ABA 2: ADICIONAR CLIENTES -->
+            <!-- ABA 2: CADASTRO DE CLIENTES -->
             <section id="clientes" class="tab-content hidden space-y-6">
-                <h2 class="text-xl font-bold border-b pb-2 text-blue-600">Ficha de Cadastro de Clientes</h2>
+                <h2 class="text-xl font-bold border-b pb-2 text-blue-600">Área de Clientes</h2>
                 
                 <form id="clienteForm" onsubmit="salvarCliente(event)" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="md:col-span-2">
@@ -107,23 +133,24 @@
                         <input type="text" id="cNome" required class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">WhatsApp / Telefone *</label>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">WhatsApp / Contato *</label>
                         <input type="text" id="cTelefone" placeholder="(00) 00000-0000" required class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div class="md:col-span-3 text-right">
                         <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-700 transition">
-                            Cadastrar Cliente
+                            Cadastrar Novo Cliente
                         </button>
                     </div>
                 </form>
 
                 <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+                    <div class="p-4 bg-gray-50 text-xs font-medium text-gray-500 italic">💡 Clique em cima do nome de um cliente para ver o histórico de ordens dele.</div>
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-gray-50 border-b border-gray-200 text-gray-600 text-xs uppercase font-bold tracking-wider">
-                                <th class="p-3">Nome do Cliente</th>
+                            <tr class="bg-gray-100 border-b border-gray-200 text-gray-600 text-xs uppercase font-bold tracking-wider">
+                                <th class="p-3">Nome do Cliente (Clique para Ver Histórico)</th>
                                 <th class="p-3">Contato</th>
-                                <th class="p-3 text-center">Remover</th>
+                                <th class="p-3 text-center">Ação</th>
                             </tr>
                         </thead>
                         <tbody id="tabelaClientes" class="divide-y divide-gray-100 text-sm"></tbody>
@@ -132,31 +159,35 @@
             </section>
 
 
-            <!-- ABA 3: ORDENS DE SERVIÇO -->
+            <!-- ABA 3: ORDENS DE SERVIÇO (O.S) -->
             <section id="os" class="tab-content hidden space-y-6">
-                <h2 class="text-xl font-bold border-b pb-2 text-blue-600">Abertura e Controle de Ordens de Serviço (O.S.)</h2>
+                <h2 class="text-xl font-bold border-b pb-2 text-blue-600">Abertura de Serviços & Orçamentos</h2>
                 
                 <form id="osForm" onsubmit="salvarOS(event)" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Selecionar Cliente Vinculado *</label>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Cliente Vinculado *</label>
                         <select id="osCliente" required class="w-full p-2 border rounded bg-white outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">-- Selecione --</option>
+                            <option value="">-- Escolha --</option>
                         </select>
                     </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Aparelho e Defeito / Serviço *</label>
-                        <input type="text" id="osAparelho" placeholder="Ex: iPhone 13 Pro - Troca de Tela e Conector" required class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Aparelho *</label>
+                        <input type="text" id="osAparelho" placeholder="Ex: iPhone 11 ou Moto G52" required class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Mão de Obra / Serviço (R$)</label>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Serviço Realizado / Problema *</label>
+                        <input type="text" id="osServico" placeholder="Ex: Troca de conector de carga" required class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Mão de Obra (R$)</label>
                         <input type="number" step="0.01" id="osMaoObra" value="0.00" class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Valor da Peça (Custo Desconto)</label>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Valor das Peças (R$)</label>
                         <input type="number" step="0.01" id="osPeca" value="0.00" class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Status Inicial</label>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Status do Serviço</label>
                         <select id="osStatus" class="w-full p-2 border rounded bg-white outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="Orçamento">Orçamento</option>
                             <option value="Aprovado">Aprovado / Em Reparo</option>
@@ -164,12 +195,12 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Data de Entrada</label>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Data de Entrega / Entrada</label>
                         <input type="date" id="osData" required class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div class="md:col-span-2 text-right pt-6">
                         <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition">
-                            Emitir Ordem de Serviço
+                            Gravar Ordem de Serviço
                         </button>
                     </div>
                 </form>
@@ -179,10 +210,10 @@
                         <thead>
                             <tr class="bg-gray-50 border-b border-gray-200 text-gray-600 text-xs uppercase font-bold tracking-wider">
                                 <th class="p-3">Cliente</th>
-                                <th class="p-3">Aparelho / Problema</th>
-                                <th class="p-3">Modificar Status</th>
+                                <th class="p-3">Aparelho / Serviço</th>
+                                <th class="p-3">Alterar Status</th>
                                 <th class="p-3">Total Bruto</th>
-                                <th class="p-3 text-center">Ações de Entrega</th>
+                                <th class="p-3 text-center">Ações</th>
                             </tr>
                         </thead>
                         <tbody id="tabelaOS" class="divide-y divide-gray-100 text-sm"></tbody>
@@ -191,41 +222,37 @@
             </section>
 
 
-            <!-- ABA 4: PLANILHA DE DESEMPENHO E FILTRO CALENDÁRIO -->
+            <!-- ABA 4: PLANILHA DE DESEMPENHO -->
             <section id="planilha" class="tab-content hidden space-y-6">
                 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b pb-2">
                     <div>
-                        <h2 class="text-xl font-bold text-gray-800">Planilha de Auditoria & Desempenhos</h2>
-                        <p class="text-xs text-gray-500">Selecione um dia específico no calendário para detalhar os caixas técnicos.</p>
+                        <h2 class="text-xl font-bold text-gray-800">Planilha Gerencial & Auditoria</h2>
                     </div>
                     
-                    <!-- Filtro Seletor Interativo -->
                     <div class="flex items-center gap-2 bg-white p-2 rounded-xl shadow-sm border border-gray-200">
                         <label class="text-xs font-bold text-gray-600 uppercase">Acessar Desempenho do Dia:</label>
                         <input type="date" id="buscaPlanilhaData" onchange="atualizarPlanilhaFiltrada()" class="border p-1.5 rounded outline-none font-bold text-sm text-gray-700 focus:ring-2 focus:ring-blue-500">
                     </div>
                 </div>
 
-                <!-- Cards do Dia Selecionado -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="bg-gray-800 text-white p-4 rounded-xl shadow-sm">
-                        <p class="text-xs text-gray-400 font-bold uppercase">Faturamento no Dia Escolhido</p>
+                        <p class="text-xs text-gray-400 font-bold uppercase">Faturamento Bruto (Dia Escolhido)</p>
                         <p id="planilha-fat-dia" class="text-xl font-bold">R$ 0,00</p>
                     </div>
                     <div class="bg-gray-800 text-white p-4 rounded-xl shadow-sm">
-                        <p class="text-xs text-gray-400 font-bold uppercase">Custo de Peças Descontado</p>
+                        <p class="text-xs text-gray-400 font-bold uppercase">Custo de Peças (Desconto)</p>
                         <p id="planilha-custo-dia" class="text-xl font-bold text-red-400">R$ 0,00</p>
                     </div>
                     <div class="bg-blue-900 text-white p-4 rounded-xl shadow-sm">
-                        <p class="text-xs text-blue-300 font-bold uppercase">Lucro Líquido Obtido</p>
+                        <p class="text-xs text-blue-300 font-bold uppercase">LUCRO REAL OBTIDO</p>
                         <p id="planilha-lucro-dia" class="text-xl font-bold text-green-400">R$ 0,00</p>
                     </div>
                 </div>
 
-                <!-- Planilha Gerencial com Botão de Impressão Completa -->
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 space-y-4">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-sm font-bold text-gray-700 uppercase">Relação Completa de Registros (Histórico Geral)</h3>
+                    <div class="flex justify-between items-center flex-wrap gap-2">
+                        <h3 class="text-sm font-bold text-gray-700 uppercase">Histórico Técnico Total</h3>
                         <button onclick="gerarRelatorioGerencial()" class="bg-gray-900 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-black transition">
                             Imprimir Planilha de Lucros (PDF)
                         </button>
@@ -237,6 +264,7 @@
                                 <tr class="bg-gray-100 border-b border-gray-300 font-bold text-gray-700 uppercase">
                                     <th class="p-2">Data</th>
                                     <th class="p-2">Cliente</th>
+                                    <th class="p-2">Aparelho</th>
                                     <th class="p-2">Status</th>
                                     <th class="p-2">Mão de Obra</th>
                                     <th class="p-2">Custo Peça</th>
@@ -253,41 +281,58 @@
 
             <!-- ABA 5: CALENDÁRIO DE GARANTIAS (3 MESES) -->
             <section id="garantias" class="tab-content hidden space-y-6">
-                <h2 class="text-xl font-bold border-b pb-2 text-blue-600">Acompanhamento Automático de Prazos de Garantia</h2>
-                <p class="text-xs text-gray-500">Monitore aqui o período legal de **3 meses (90 dias)** calculado para os aparelhos cujo status está como <strong>"Realizado / Concluído"</strong>.</p>
-                
+                <h2 class="text-xl font-bold border-b pb-2 text-blue-600">Acompanhamento de Garantias</h2>
+                <p class="text-xs text-gray-500">Monitoramento automático baseado no prazo legal de *3 meses* para as ordens com status "Realizado / Concluído".</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="listaGarantias"></div>
             </section>
 
         </div>
     </div>
 
-    <!-- LOGICA E CORE DO APLICATIVO -->
+    <!-- JANELA MODAL: HISTÓRICO ESPECÍFICO DO CLIENTE -->
+    <div id="modalHistorico" class="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white w-full max-w-2xl rounded-2xl p-6 shadow-2xl flex flex-col max-h-[85vh]">
+            <div class="flex justify-between items-center border-b pb-3">
+                <div>
+                    <h3 id="modalNomeCliente" class="text-lg font-bold text-gray-900">Histórico do Cliente</h3>
+                    <p id="modalContratoCliente" class="text-xs text-gray-500"></p>
+                </div>
+                <button onclick="fecharModalHistorico()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
+            </div>
+            <div class="overflow-y-auto py-4 flex-1 space-y-3" id="modalListaServicos">
+                <!-- Preenchido via JavaScript -->
+            </div>
+            <div class="border-t pt-3 text-right">
+                <button onclick="fecharModalHistorico()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm">Fechar Janela</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- JAVASCRIPT LOGIC -->
     <script>
-        // Armazenamento estruturado no LocalStorage para permanência permanente dos dados
         let bancoClientes = JSON.parse(localStorage.getItem('jvcell_clientes')) || [];
         let bancoOS = JSON.parse(localStorage.getItem('jvcell_os')) || [];
 
-        // Inicializador de datas padrões
+        // Inicia datas no dia atual
         const hojeIso = new Date().toISOString().split('T')[0];
         document.getElementById('osData').value = hojeIso;
         document.getElementById('buscaPlanilhaData').value = hojeIso;
 
-        // --- CONTROLE DE ACESSO E VALIDAÇÃO DE LOGIN ---
+        // --- AUTENTICAÇÃO ---
         function autenticar(e) {
             e.preventDefault();
             const usuario = document.getElementById('loginUser').value.trim();
             const senha = document.getElementById('loginPassword').value;
 
-            // Credenciais solicitadas pelo proprietário
             if (usuario === "jvcell@gmail.com" && senha === "Aylla2605..") {
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('mainSystem').classList.remove('hidden');
-                sincronizarDados();
+                sincronizarTudo();
             } else {
                 const erroBox = document.getElementById('loginErro');
                 erroBox.classList.remove('hidden');
-                setTimeout(() => erroBox.classList.add('hidden'), 3500);
+                setTimeout(() => erroBox.classList.add('hidden'), 3000);
             }
         }
 
@@ -297,7 +342,7 @@
             document.getElementById('loginScreen').classList.remove('hidden');
         }
 
-        // --- SISTEMA DINÂMICO DE ALTERNÂNCIA DE ABAS ---
+        // --- NAVEGAÇÃO ---
         function showSection(id) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-blue-800'));
@@ -305,10 +350,10 @@
             document.getElementById(id).classList.remove('hidden');
             event.currentTarget.classList.add('bg-blue-800');
 
-            sincronizarDados();
+            sincronizarTudo();
         }
 
-        function sincronizarDados() {
+        function sincronizarTudo() {
             atualizarResumosHome();
             renderizarClientes();
             atualizarSelectClientes();
@@ -318,7 +363,7 @@
             listarGarantias();
         }
 
-        // --- FUNÇÕES DA ABA CLIENTES ---
+        // --- CLIENTES ---
         function salvarCliente(e) {
             e.preventDefault();
             const novo = {
@@ -329,14 +374,14 @@
             bancoClientes.push(novo);
             localStorage.setItem('jvcell_clientes', JSON.stringify(bancoClientes));
             document.getElementById('clienteForm').reset();
-            sincronizarDados();
+            sincronizarTudo();
         }
 
         function deletarCliente(id) {
-            if(confirm('Tem certeza de que deseja remover este cliente permanentemente?')) {
+            if(confirm('Remover este cliente e desvincular do banco?')) {
                 bancoClientes = bancoClientes.filter(c => c.id !== id);
                 localStorage.setItem('jvcell_clientes', JSON.stringify(bancoClientes));
-                sincronizarDados();
+                sincronizarTudo();
             }
         }
 
@@ -344,9 +389,15 @@
             const tbody = document.getElementById('tabelaClientes');
             tbody.innerHTML = '';
             bancoClientes.forEach(c => {
+                // Conta quantos serviços esse cliente específico tem registrado
+                const qtdServicos = bancoOS.filter(o => o.cliente === c.nome).length;
+                const badgeServicos = qtdServicos > 0 ? <span class="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full font-black text-xs">${qtdServicos} O.S.</span> : '';
+
                 tbody.innerHTML += `
-                    <tr class="hover:bg-gray-50">
-                        <td class="p-3 font-bold text-gray-900">${c.nome}</td>
+                    <tr class="hover:bg-blue-50/50 transition">
+                        <td class="p-3 font-bold text-blue-700 cursor-pointer underline decoration-dotted" onclick="abrirModalHistorico('${c.nome}', '${c.telefone}')">
+                            ${c.nome} ${badgeServicos}
+                        </td>
                         <td class="p-3 text-gray-600">${c.telefone}</td>
                         <td class="p-3 text-center">
                             <button onclick="deletarCliente(${c.id})" class="text-xs bg-red-100 text-red-600 font-bold px-2 py-1 rounded hover:bg-red-200">Excluir</button>
@@ -358,13 +409,53 @@
 
         function atualizarSelectClientes() {
             const select = document.getElementById('osCliente');
-            select.innerHTML = '<option value="">-- Selecione --</option>';
+            select.innerHTML = '<option value="">-- Escolha --</option>';
             bancoClientes.forEach(c => {
-                select.innerHTML += `<option value="${c.nome}" data-tel="${c.telefone}">${c.nome}</option>`;
+                select.innerHTML += <option value="${c.nome}" data-tel="${c.telefone}">${c.nome}</option>;
             });
         }
 
-        // --- FUNÇÕES DA ABA ORDENS DE SERVIÇO ---
+        // --- DETALHAMENTO DE HISTÓRICO MULTI-SERVIÇOS (MODAL) ---
+        function abrirModalHistorico(nomeCliente, telefone) {
+            document.getElementById('modalNomeCliente').innerText = Histórico Técnico: ${nomeCliente};
+            document.getElementById('modalContratoCliente').innerText = Contato Cadastrado: ${telefone};
+            
+            const container = document.getElementById('modalListaServicos');
+            container.innerHTML = '';
+
+            const servicosDesteCliente = bancoOS.filter(o => o.cliente === nomeCliente);
+
+            if(servicosDesteCliente.length === 0) {
+                container.innerHTML = <p class="text-sm text-gray-500 text-center py-4">Nenhum serviço registrado ainda para este cliente.</p>;
+            } else {
+                servicosDesteCliente.forEach((o, index) => {
+                    const total = o.maoObra + o.peca;
+                    container.innerHTML += `
+                        <div class="p-4 border border-gray-200 rounded-xl bg-gray-50 space-y-1">
+                            <div class="flex justify-between items-center text-xs font-bold text-gray-400">
+                                <span>#${index + 1} - Entrada em ${o.data.split('-').reverse().join('/')}</span>
+                                <span class="px-2 py-0.5 rounded ${o.status === 'Realizado' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">${o.status}</span>
+                            </div>
+                            <p class="text-sm font-bold text-gray-800"><span class="text-gray-400 font-medium">Aparelho:</span> ${o.aparelho}</p>
+                            <p class="text-sm text-gray-600"><span class="text-gray-400 font-medium">Serviço:</span> ${o.servico}</p>
+                            <div class="pt-2 text-xs flex justify-between border-t border-gray-200 text-gray-500">
+                                <span>Mão de Obra: R$ ${o.maoObra.toFixed(2)}</span>
+                                <span>Peça: R$ ${o.peca.toFixed(2)}</span>
+                                <span class="font-bold text-gray-700">Total: R$ ${total.toFixed(2)}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('modalHistorico').classList.remove('hidden');
+        }
+
+        function fecharModalHistorico() {
+            document.getElementById('modalHistorico').classList.add('hidden');
+        }
+
+        // --- ORDENS DE SERVIÇO ---
         function salvarOS(e) {
             e.preventDefault();
             const selectEl = document.getElementById('osCliente');
@@ -375,6 +466,7 @@
                 cliente: selectEl.value,
                 telefone: tel,
                 aparelho: document.getElementById('osAparelho').value,
+                servico: document.getElementById('osServico').value,
                 maoObra: parseFloat(document.getElementById('osMaoObra').value) || 0,
                 peca: parseFloat(document.getElementById('osPeca').value) || 0,
                 status: document.getElementById('osStatus').value,
@@ -385,8 +477,8 @@
             localStorage.setItem('jvcell_os', JSON.stringify(bancoOS));
             document.getElementById('osForm').reset();
             document.getElementById('osData').value = hojeIso;
-            sincronizarDados();
-            alert('Ordem de Serviço incluída com sucesso!');
+            sincronizarTudo();
+            alert('Ordem de Serviço registrada com sucesso!');
         }
 
         function mudarStatus(id, novoStatus) {
@@ -395,14 +487,15 @@
                 return o;
             });
             localStorage.setItem('jvcell_os', JSON.stringify(bancoOS));
-            sincronizarDados();
+            sincronizarTudo();
         }
 
+        // --- DELETAR ORDEM DE SERVIÇO ---
         function deletarOS(id) {
-            if(confirm('Excluir esta ordem de serviço definitivamente?')) {
+            if(confirm('Deseja excluir permanentemente este registro de serviço?')) {
                 bancoOS = bancoOS.filter(o => o.id !== id);
                 localStorage.setItem('jvcell_os', JSON.stringify(bancoOS));
-                sincronizarDados();
+                sincronizarTudo();
             }
         }
 
@@ -415,9 +508,12 @@
                 tbody.innerHTML += `
                     <tr class="hover:bg-gray-50">
                         <td class="p-3 font-bold text-gray-900">${o.cliente}</td>
-                        <td class="p-3 text-gray-600">${o.aparelho}</td>
+                        <td class="p-3 text-gray-600">
+                            <p class="font-semibold text-gray-800">${o.aparelho}</p>
+                            <p class="text-xs text-gray-400">${o.servico}</p>
+                        </td>
                         <td class="p-3">
-                            <select onchange="mudarStatus(${o.id}, this.value)" class="p-1 text-xs border rounded bg-white font-semibold">
+                            <select onchange="mudarStatus(${o.id}, this.value)" class="p-1 text-xs border rounded bg-white font-semibold outline-none">
                                 <option value="Orçamento" ${o.status === 'Orçamento' ? 'selected' : ''}>Orçamento</option>
                                 <option value="Aprovado" ${o.status === 'Aprovado' ? 'selected' : ''}>Aprovado</option>
                                 <option value="Realizado" ${o.status === 'Realizado' ? 'selected' : ''}>Realizado / Concluído</option>
@@ -425,30 +521,30 @@
                         </td>
                         <td class="p-3 font-bold text-gray-700">R$ ${total.toFixed(2)}</td>
                         <td class="p-3 text-center space-x-1 whitespace-nowrap">
-                            <button onclick="gerarReciboCliente(${o.id})" class="text-xs bg-blue-600 text-white px-2 py-1 rounded font-bold hover:bg-blue-700">Gerar Recibo</button>
-                            <button onclick="deletarOS(${o.id})" class="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded hover:bg-gray-300">Excluir</button>
+                            <button onclick="gerarReciboCliente(${o.id})" class="text-xs bg-blue-600 text-white px-2 py-1 rounded font-bold hover:bg-blue-700">Recibo Cliente</button>
+                            <button onclick="deletarOS(${o.id})" class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded font-bold hover:bg-red-200">Excluir</button>
                         </td>
                     </tr>
                 `;
             });
         }
 
-        // --- ABA 4: PLANILHA E CONTROLE DE FILTRO SELECIONADO ---
+        // --- PLANILHA E DESEMPENHO ---
         function renderizarPlanilhaGeral() {
             const tbody = document.getElementById('corpoPlanilhaGeral');
             tbody.innerHTML = '';
             bancoOS.forEach(o => {
                 const total = o.maoObra + o.peca;
-                const lucro = o.maoObra; // Lucro é igual ao total bruto menos o valor da peça (ou seja, a mão de obra)
                 tbody.innerHTML += `
-                    <tr class="hover:bg-gray-50">
-                        <td class="p-2 text-gray-500">${o.data.split('-').reverse().join('/')}</td>
-                        <td class="p-2 font-semibold">${o.cliente}</td>
-                        <td class="p-2"><span class="px-1 py-0.5 rounded text-[10px] font-bold ${o.status === 'Realizado' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">${o.status}</span></td>
+                    <tr class="hover:bg-gray-50 text-gray-700">
+                        <td class="p-2 text-gray-400">${o.data.split('-').reverse().join('/')}</td>
+                        <td class="p-2 font-bold text-gray-900">${o.cliente}</td>
+                        <td class="p-2">${o.aparelho}</td>
+                        <td class="p-2"><span class="px-1.5 py-0.5 text-[10px] rounded font-bold ${o.status === 'Realizado' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">${o.status}</span></td>
                         <td class="p-2">R$ ${o.maoObra.toFixed(2)}</td>
                         <td class="p-2 text-red-500">R$ ${o.peca.toFixed(2)}</td>
-                        <td class="p-2 font-bold">R$ ${total.toFixed(2)}</td>
-                        <td class="p-2 text-green-600 font-bold">R$ ${lucro.toFixed(2)}</td>
+                        <td class="p-2 font-black text-gray-800">R$ ${total.toFixed(2)}</td>
+                        <td class="p-2 text-green-600 font-bold">R$ ${o.maoObra.toFixed(2)}</td>
                     </tr>
                 `;
             });
@@ -464,12 +560,12 @@
                 custoDia += o.peca;
             });
 
-            document.getElementById('planilha-fat-dia').innerText = `R$ ${fatDia.toFixed(2)}`;
-            document.getElementById('planilha-custo-dia').innerText = `R$ ${custoDia.toFixed(2)}`;
-            document.getElementById('planilha-lucro-dia').innerText = `R$ ${(fatDia - custoDia).toFixed(2)}`;
+            document.getElementById('planilha-fat-dia').innerText = R$ ${fatDia.toFixed(2)};
+            document.getElementById('planilha-custo-dia').innerText = R$ ${custoDia.toFixed(2)};
+            document.getElementById('planilha-lucro-dia').innerText = R$ ${(fatDia - custoDia).toFixed(2)};
         }
 
-        // --- GERADOR DE COMPROVANTES EM PDF (REGRAS ESPECÍFICAS) ---
+        // --- PDF COMPROVANTE DO CLIENTE (NÃO MOSTRAR CUSTO DE PEÇAS OU MÃO DE OBRA SEPARADAS) ---
         function gerarReciboCliente(id) {
             const o = bancoOS.find(item => item.id === id);
             if(!o) return;
@@ -478,182 +574,176 @@
             const doc = new jsPDF();
             const total = o.maoObra + o.peca;
 
-            // Cabeçalho da assistência
             doc.setFont("Helvetica", "bold");
             doc.setFontSize(22);
             doc.text("JV CELL - ASSISTÊNCIA TÉCNICA", 20, 25);
             
             doc.setFontSize(10);
             doc.setFont("Helvetica", "normal");
-            doc.text("Soluções Avançadas e Reparos de Smartphones", 20, 32);
-            doc.text(`Comprovante emitido em: ${new Date().toLocaleDateString('pt-BR')}`, 20, 37);
+            doc.text("Reparos de Precisão e Manutenção Especializada", 20, 32);
+            doc.text(Emissão: ${new Date().toLocaleDateString('pt-BR')}, 20, 37);
             doc.line(20, 42, 190, 42);
 
             doc.setFontSize(12);
             doc.setFont("Helvetica", "bold");
-            doc.text("RECIBO DE PRESTAÇÃO DE SERVIÇO", 20, 52);
+            doc.text("COMPROVANTE DE ENTREGA / ORDEM DE SERVIÇO", 20, 52);
 
             doc.setFont("Helvetica", "normal");
-            doc.text(`Cliente: ${o.cliente}`, 20, 62);
-            doc.text(`Telefone: ${o.telefone || 'Não Fornecido'}`, 20, 70);
-            doc.text(`Equipamento: ${o.aparelho}`, 20, 78);
-            doc.text(`Entrada em: ${o.data.split('-').reverse().join('/')}`, 20, 86);
-            doc.line(20, 94, 190, 94);
+            doc.text(Cliente: ${o.cliente}, 20, 62);
+            doc.text(Contato: ${o.telefone || 'Não Informado'}, 20, 70);
+            doc.text(Equipamento: ${o.aparelho}, 20, 78);
+            doc.text(Serviço Executado: ${o.servico}, 20, 86);
+            doc.text(Data: ${o.data.split('-').reverse().join('/')}, 20, 94);
+            doc.line(20, 102, 190, 102);
 
-            doc.setFont("Helvetica", "bold");
-            doc.text("Detalhamento:", 20, 105);
-            doc.setFont("Helvetica", "normal");
-            doc.text("Mão de obra qualificada aplicada na troca de componentes internos do dispositivo.", 20, 113);
-            
-            // Regra rígida definida pelo usuário: Ocultar valores fragmentados (peça e mão de obra) exibindo apenas o TOTAL
+            // REGRA: Sem valores de peça ou mão de obra individualizados para o cliente final.
             doc.setFontSize(14);
             doc.setFont("Helvetica", "bold");
-            doc.text(`VALOR TOTAL A PAGAR: R$ ${total.toFixed(2)}`, 20, 135);
+            doc.text(VALOR TOTAL CONCLUÍDO: R$ ${total.toFixed(2)}, 20, 120);
 
-            doc.line(20, 145, 190, 145);
+            doc.line(20, 130, 190, 130);
             doc.setFontSize(9);
             doc.setFont("Helvetica", "italic");
-            doc.text("Termo: Garantia legal de 3 meses (90 dias) exclusiva sobre os itens substituídos.", 20, 155);
-            doc.text("A garantia será anulada em casos de quedas, oxidação por água ou violação de lacres.", 20, 160);
+            doc.text("Termos de Garantia: Cobertura legal de 3 meses (90 dias) exclusiva sobre o reparo efetuado.", 20, 140);
+            doc.text("A garantia perde a validade em casos de quedas, trincados, umidade ou selos rompidos.", 20, 145);
 
-            doc.line(20, 200, 90, 200);
-            doc.text("Assinatura do Técnico", 25, 205);
-            doc.line(120, 200, 190, 200);
-            doc.text("Assinatura do Cliente", 130, 205);
+            doc.line(20, 190, 90, 190);
+            doc.text("Assinatura Técnica", 25, 195);
+            doc.line(120, 190, 190, 190);
+            doc.text("Assinatura do Cliente", 130, 195);
 
-            doc.save(`Recibo_JVCELL_${o.cliente.replace(/\s+/g, '_')}.pdf`);
+            doc.save(Recibo_JVCELL_${o.cliente.replace(/\s+/g, '_')}.pdf);
         }
 
-        // --- IMPRESSÃO COMPLETA DO RELATÓRIO INTERNO (LUCRO REAL) ---
+        // --- PDF PLANILHA INTERNA COMPLETA (MOSTRA CUSTO DE PEÇAS E CALCULA LUCRO REAL) ---
         function gerarRelatorioGerencial() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
             doc.setFont("Helvetica", "bold");
-            doc.text("RELATÓRIO DE FECHAMENTO E LUCRO - JV CELL", 20, 20);
+            doc.text("BALANÇO FINANCEIRO DE DESEMPENHO - JV CELL", 20, 20);
             doc.setFontSize(10);
             doc.setFont("Helvetica", "normal");
-            doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 20, 27);
+            doc.text(Planilha emitida em: ${new Date().toLocaleString('pt-BR')}, 20, 27);
             doc.line(20, 32, 190, 32);
 
             let y = 42;
             let brutoTotal = 0, pecasTotal = 0, lucroTotal = 0;
 
             doc.setFont("Helvetica", "bold");
-            doc.text("Cliente / Aparelho", 20, y);
-            doc.text("Total Bruto", 120, y);
-            doc.text("Custo Peça", 145, y);
-            doc.text("Lucro Líq.", 170, y);
+            doc.text("Cliente / Equipamento", 20, y);
+            doc.text("Bruto", 125, y);
+            doc.text("Custo Peça", 150, y);
+            doc.text("Lucro Real", 173, y);
             y += 8;
             doc.line(20, y-4, 190, y-4);
 
             doc.setFont("Helvetica", "normal");
             bancoOS.forEach(o => {
                 const totalItem = o.maoObra + o.peca;
-                const lucroItem = o.maoObra; 
+                const lucroItem = o.maoObra; // Mão de obra limpa = Lucro
 
                 brutoTotal += totalItem;
                 pecasTotal += o.peca;
                 lucroTotal += lucroItem;
 
                 if(y > 270) { doc.addPage(); y = 20; }
-                doc.text(`${o.cliente} - ${o.aparelho.substring(0,25)}`, 20, y);
-                doc.text(`R$ ${totalItem.toFixed(2)}`, 120, y);
-                doc.text(`R$ ${o.peca.toFixed(2)}`, 145, y);
-                doc.text(`R$ ${lucroItem.toFixed(2)}`, 170, y);
+                doc.text(${o.cliente} (${o.aparelho.substring(0,18)}), 20, y);
+                doc.text(R$ ${totalItem.toFixed(2)}, 125, y);
+                doc.text(R$ ${o.peca.toFixed(2)}, 150, y);
+                doc.text(R$ ${lucroItem.toFixed(2)}, 173, y);
                 y += 8;
             });
 
             doc.line(20, y, 190, y);
             y += 10;
             doc.setFont("Helvetica", "bold");
-            doc.text(`Faturamento Geral Bruto: R$ ${brutoTotal.toFixed(2)}`, 20, y);
-            doc.text(`Total de Custo em Peças (Descontos): R$ ${pecasTotal.toFixed(2)}`, 20, y+6);
-            doc.text(`LUCRO REAL LÍQUIDO CONSOLIDADO: R$ ${lucroTotal.toFixed(2)}`, 20, y+12);
+            doc.text(Faturamento Geral Bruto: R$ ${brutoTotal.toFixed(2)}, 20, y);
+            doc.text(Custo Descontado em Peças: R$ ${pecasTotal.toFixed(2)}, 20, y+6);
+            doc.text(LUCRO REAL LÍQUIDO CONSOLIDADO: R$ ${lucroTotal.toFixed(2)}, 20, y+12);
 
             doc.save("Planilha_Financeira_JVCELL.pdf");
         }
 
-        // --- ABA 5: CALENDÁRIO VISUAL DE GARANTIAS (3 MESES) ---
+        // --- CALENDÁRIO DE GARANTIAS ---
         function listarGarantias() {
             const container = document.getElementById('listaGarantias');
             container.innerHTML = '';
             const concluidos = bancoOS.filter(o => o.status === 'Realizado');
 
             if(concluidos.length === 0) {
-                container.innerHTML = '<p class="text-sm text-gray-400 col-span-3 font-medium">Nenhuma ordem concluída para monitoramento de prazo.</p>';
+                container.innerHTML = '<p class="text-sm text-gray-400 col-span-3 font-medium">Nenhum aparelho concluído com garantia ativa.</p>';
                 return;
             }
 
             concluidos.forEach(o => {
                 const dataBase = new Date(o.data + 'T00:00:00');
-                dataBase.setMonth(dataBase.getMonth() + 3); // Cálculo exato da garantia contratual de 3 meses
+                dataBase.setMonth(dataBase.getMonth() + 3); // Prorroga 3 meses exatos
 
                 const hoje = new Date();
-                const diffDias = Math.ceil((dataBase - hoje) / (1000 * 60 * 60 * 24));
+                const restam = Math.ceil((dataBase - hoje) / (1000 * 60 * 60 * 24));
                 
-                let estiloCard = 'border-green-200 bg-green-50 text-green-800';
-                let statusTexto = `${diffDias} Dias Restantes`;
+                let corCard = 'border-green-200 bg-green-50 text-green-800';
+                let txt = ${restam} Dias Restantes;
 
-                if(diffDias <= 0) {
-                    estiloCard = 'border-red-200 bg-red-50 text-red-800';
-                    statusTexto = 'Garantia Expirada';
-                } else if(diffDias <= 15) {
-                    estiloCard = 'border-amber-200 bg-amber-50 text-amber-800';
+                if(restam <= 0) {
+                    corCard = 'border-red-200 bg-red-50 text-red-800';
+                    txt = 'Garantia Expirada';
+                } else if(restam <= 15) {
+                    corCard = 'border-amber-200 bg-amber-50 text-amber-800';
                 }
 
                 container.innerHTML += `
-                    <div class="p-4 border rounded-xl shadow-sm ${estiloCard} flex flex-col justify-between">
+                    <div class="p-4 border rounded-xl shadow-sm ${corCard} flex flex-col justify-between">
                         <div>
                             <h4 class="font-bold text-gray-900">${o.cliente}</h4>
-                            <p class="text-xs text-gray-700 font-medium">Dispositivo: ${o.aparelho}</p>
-                            <p class="text-xs text-gray-500 mt-2">Expira em: <span class="font-bold text-gray-800">${dataBase.toLocaleDateString('pt-BR')}</span></p>
+                            <p class="text-xs text-gray-700">Celular: ${o.aparelho}</p>
+                            <p class="text-[11px] text-gray-500 mt-1">Expira em: ${dataBase.toLocaleDateString('pt-BR')}</p>
                         </div>
-                        <div class="text-right mt-3">
-                            <span class="text-[10px] uppercase font-black tracking-wider px-2 py-0.5 border border-current rounded">${statusTexto}</span>
+                        <div class="text-right mt-2">
+                            <span class="text-[10px] font-black uppercase px-2 py-0.5 border border-current rounded">${txt}</span>
                         </div>
                     </div>
                 `;
             });
         }
 
-        // --- RENDERIZAÇÃO AUTOMÁTICA DO RESUMO DIÁRIO E GRÁFICOS (HOME) ---
+        // --- DASHBOARD AUTOMÁTICO E GRÁFICOS ---
         let dChart = null;
         let mChart = null;
 
         function atualizarResumosHome() {
-            // Coleta dados automáticos baseados no dia atual do calendário local
-            const registrosHoje = bancoOS.filter(o => o.data === hojeIso);
+            const itensHoje = bancoOS.filter(o => o.data === hojeIso);
 
-            let faturamento = 0, custos = 0;
-            registrosHoje.forEach(o => {
-                faturamento += (o.maoObra + o.peca);
-                custos += o.peca;
+            let fat = 0, pecas = 0;
+            itensHoje.forEach(o => {
+                fat += (o.maoObra + o.peca);
+                pecas += o.peca;
             });
 
-            document.getElementById('fat-hoje').innerText = `R$ ${faturamento.toFixed(2)}`;
-            document.getElementById('custo-hoje').innerText = `R$ ${custos.toFixed(2)}`;
-            document.getElementById('lucro-hoje').innerText = `R$ ${(faturamento - custos).toFixed(2)}`;
+            document.getElementById('fat-hoje').innerText = R$ ${fat.toFixed(2)};
+            document.getElementById('custo-hoje').innerText = R$ ${pecas.toFixed(2)};
+            document.getElementById('lucro-hoje').innerText = R$ ${(fat - pecas).toFixed(2)};
 
-            renderizarGraficosDinâmicos();
+            gerarGraficos();
         }
 
-        function renderizarGraficosDinâmicos() {
-            const rotulosDias = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+        function gerarGraficos() {
+            const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
             const ultimos7Dias = Array.from({length: 7}, (_, i) => {
                 const d = new Date(); d.setDate(d.getDate() - i); return d.toISOString().split('T')[0];
             }).reverse();
 
-            const faturamentosDiarios = ultimos7Dias.map(dt => bancoOS.filter(o => o.data === dt).reduce((acc, curr) => acc + (curr.maoObra + curr.peca), 0));
-            const labelsFormatados = ultimos7Dias.map(dt => { const d = new Date(dt + 'T00:00:00'); return `${rotulosDias[d.getDay()]} (${d.getDate()}/${d.getMonth()+1})`; });
+            const faturamentosDiarios = ultimos7Dias.map(dt => bancoOS.filter(o => o.data === dt).reduce((a, b) => a + (b.maoObra + b.peca), 0));
+            const labelsDias = ultimos7Dias.map(dt => { const d = new Date(dt + 'T00:00:00'); return ${diasSemana[d.getDay()]} (${d.getDate()}/${d.getMonth()+1}); });
 
             if(dChart) dChart.destroy();
             if(mChart) mChart.destroy();
 
             dChart = new Chart(document.getElementById('chartDiario').getContext('2d'), {
                 type: 'bar',
-                data: { labels: labelsFormatados, datasets: [{ label: 'Faturamento Bruto R$', data: faturamentosDiarios, backgroundColor: '#2563eb', borderRadius: 6 }] },
-                options: { responsive: true, plugins: { legend: { display: false } } }
+                data: { labels: labelsDias, datasets: [{ label: 'Bruto R$', data: faturamentosDiarios, backgroundColor: '#2563eb', borderRadius: 5 }] },
+                options: { responsive: true }
             });
 
             const listaMeses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
@@ -662,8 +752,8 @@
 
             mChart = new Chart(document.getElementById('chartMensal').getContext('2d'), {
                 type: 'line',
-                data: { labels: listaMeses, datasets: [{ label: 'Performance Mensal R$', data: faturamentosMensais, borderColor: '#16a34a', backgroundColor: 'rgba(22, 163, 74, 0.05)', fill: true, tension: 0.2 }] },
-                options: { responsive: true, plugins: { legend: { display: false } } }
+                data: { labels: listaMeses, datasets: [{ label: 'Mensal R$', data: faturamentosMensais, borderColor: '#16a34a', backgroundColor: 'rgba(22, 163, 74, 0.05)', fill: true, tension: 0.15 }] },
+                options: { responsive: true }
             });
         }
     </script>
