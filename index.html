@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JV CELL - Gestão Inteligente</title>
+    <!-- Tailwind CSS para Interface Moderna -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Chart.js para os Gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- jsPDF para Relatórios Avançados -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans antialiased">
+
+    <!-- TELA DE LOGIN FIXA E SEGURA -->
+    <div id="loginScreen" class="fixed inset-0 bg-gray-900 flex flex-col items-center justify-center z-50 p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md space-y-6 border border-gray-100">
+            <div class="text-center">
+                <h1 class="text-3xl font-extrabold text-blue-600 tracking-wider">JV CELL</h1>
+                <p class="text-sm text-gray-500 mt-1">Controle de Assistência Técnica & Finanças</p>
+            </div>
+            <form id="loginForm" onsubmit="autenticar(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">E-mail de Acesso</label>
+                    <input type="email" id="loginUser" required placeholder="jvcell@gmail.com" class="w-full p-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Senha</label>
+                    <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full p-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white p-2.5 rounded-lg font-bold hover:bg-blue-700 transition shadow-md">
+                    Entrar no Sistema
+                </button>
+            </form>
+            <p id="loginErro" class="text-center text-sm text-red-600 font-bold hidden">E-mail ou senha incorretos!</p>
+        </div>
+    </div>
+
+    <!-- PAINEL OPERACIONAL PRINCIPAL -->
+    <div id="mainSystem" class="hidden">
+        
+        <!-- BARRA DE NAVEGAÇÃO -->
+        <nav class="bg-blue-600 text-white p-4 shadow-lg sticky top-0 z-40">
+            <div class="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center justify-between w-full md:w-auto">
+                    <h1 class="text-2xl font-black tracking-widest">JV CELL</h1>
+                    <button onclick="deslogar()" class="md:hidden text-xs bg-red-500 px-2 py-1 rounded font-bold">Sair</button>
+                </div>
+                <div class="flex flex-wrap gap-2 justify-center">
+                    <button onclick="showSection('dashboard')" class="nav-btn bg-blue-800 px-4 py-2 rounded-lg font-semibold transition">Início / Gráficos</button>
+                    <button onclick="showSection('clientes')" class="nav-btn px-4 py-2 rounded-lg font-semibold transition hover:bg-blue-700">Adicionar Clientes</button>
+                    <button onclick="showSection('os')" class="nav-btn px-4 py-2 rounded-lg font-semibold transition hover:bg-blue-700">Ordens de Serviço</button>
+                    <button onclick="showSection('planilha')" class="nav-btn px-4 py-2 rounded-lg font-semibold transition hover:bg-blue-700">Planilha de Desempenho</button>
+                    <button onclick="showSection('garantias')" class="nav-btn px-4 py-2 rounded-lg font-semibold transition hover:bg-blue-700">Garantias (3M)</button>
+                    <button onclick="deslogar()" class="hidden md:block bg-red-500 px-4 py-2 rounded-lg font-semibold hover:bg-red-600 transition shadow">Sair</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container mx-auto p-4 md:p-6 space-y-6">
+
+            <!-- ABA 1: RESUMO DIÁRIO E GRÁFICOS -->
+            <section id="dashboard" class="tab-content space-y-6">
+                <div class="border-b pb-2 flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-gray-800">Painel de Resumos & Gráficos</h2>
+                    <span class="text-sm bg-blue-50 text-blue-600 font-bold px-3 py-1 rounded-full border border-blue-200">Visão Geral</span>
+                </div>
+                
+                <!-- Cards de Resumo Hoje Automatizado -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-green-500">
+                        <p class="text-xs text-gray-400 font-bold uppercase">Faturamento (Hoje)</p>
+                        <p id="fat-hoje" class="text-2xl font-bold text-gray-800">R$ 0,00</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-red-500">
+                        <p class="text-xs text-gray-400 font-bold uppercase">Custo de Peças (Hoje)</p>
+                        <p id="custo-hoje" class="text-2xl font-bold text-gray-800">R$ 0,00</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-blue-500">
+                        <p class="text-xs text-gray-400 font-bold uppercase">Lucro Líquido (Hoje)</p>
+                        <p id="lucro-hoje" class="text-2xl font-bold text-blue-600">R$ 0,00</p>
+                    </div>
+                </div>
+
+                <!-- Painel Visual de Gráficos -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-sm font-bold text-gray-500 mb-4 uppercase tracking-wider">Histórico de Desempenho Diário (7 Dias)</h3>
+                        <canvas id="chartDiario" class="w-full max-h-64"></canvas>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-sm font-bold text-gray-500 mb-4 uppercase tracking-wider">Faturamento Consolidado Mensal</h3>
+                        <canvas id="chartMensal" class="w-full max-h-64"></canvas>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ABA 2: ADICIONAR CLIENTES -->
+            <section id="clientes" class="tab-content hidden space-y-6">
+                <h2 class="text-xl font-bold border-b pb-2 text-blue-600">Ficha de Cadastro de Clientes</h2>
+                
+                <form id="clienteForm" onsubmit="salvarCliente(event)" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Nome Completo do Cliente *</label>
+                        <input type="text" id="cNome" required class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">WhatsApp / Telefone *</label>
+                        <input type="text" id="cTelefone" placeholder="(00) 00000-0000" required class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="md:col-span-3 text-right">
+                        <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-700 transition">
+                            Cadastrar Cliente
+                        </button>
+                    </div>
+                </form>
+
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 border-b border-gray-200 text-gray-600 text-xs uppercase font-bold tracking-wider">
+                                <th class="p-3">Nome do Cliente</th>
+                                <th class="p-3">Contato</th>
+                                <th class="p-3 text-center">Remover</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaClientes" class="divide-y divide-gray-100 text-sm"></tbody>
+                    </table>
+                </div>
+            </section>
+
+
+            <!-- ABA 3: ORDENS DE SERVIÇO -->
+            <section id="os" class="tab-content hidden space-y-6">
+                <h2 class="text-xl font-bold border-b pb-2 text-blue-600">Abertura e Controle de Ordens de Serviço (O.S.)</h2>
+                
+                <form id="osForm" onsubmit="salvarOS(event)" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Selecionar Cliente Vinculado *</label>
+                        <select id="osCliente" required class="w-full p-2 border rounded bg-white outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">-- Selecione --</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Aparelho e Defeito / Serviço *</label>
+                        <input type="text" id="osAparelho" placeholder="Ex: iPhone 13 Pro - Troca de Tela e Conector" required class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Mão de Obra / Serviço (R$)</label>
+                        <input type="number" step="0.01" id="osMaoObra" value="0.00" class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Valor da Peça (Custo Desconto)</label>
+                        <input type="number" step="0.01" id="osPeca" value="0.00" class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Status Inicial</label>
+                        <select id="osStatus" class="w-full p-2 border rounded bg-white outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="Orçamento">Orçamento</option>
+                            <option value="Aprovado">Aprovado / Em Reparo</option>
+                            <option value="Realizado">Realizado / Concluído</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Data de Entrada</label>
+                        <input type="date" id="osData" required class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="md:col-span-2 text-right pt-6">
+                        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition">
+                            Emitir Ordem de Serviço
+                        </button>
+                    </div>
+                </form>
+
+                <div class="bg-white rounded-xl shadow-sm overflow-x-auto border border-gray-100">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 border-b border-gray-200 text-gray-600 text-xs uppercase font-bold tracking-wider">
+                                <th class="p-3">Cliente</th>
+                                <th class="p-3">Aparelho / Problema</th>
+                                <th class="p-3">Modificar Status</th>
+                                <th class="p-3">Total Bruto</th>
+                                <th class="p-3 text-center">Ações de Entrega</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaOS" class="divide-y divide-gray-100 text-sm"></tbody>
+                    </table>
+                </div>
+            </section>
+
+
+            <!-- ABA 4: PLANILHA DE DESEMPENHO E FILTRO CALENDÁRIO -->
+            <section id="planilha" class="tab-content hidden space-y-6">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b pb-2">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-800">Planilha de Auditoria & Desempenhos</h2>
+                        <p class="text-xs text-gray-500">Selecione um dia específico no calendário para detalhar os caixas técnicos.</p>
+                    </div>
+                    
+                    <!-- Filtro Seletor Interativo -->
+                    <div class="flex items-center gap-2 bg-white p-2 rounded-xl shadow-sm border border-gray-200">
+                        <label class="text-xs font-bold text-gray-600 uppercase">Acessar Desempenho do Dia:</label>
+                        <input type="date" id="buscaPlanilhaData" onchange="atualizarPlanilhaFiltrada()" class="border p-1.5 rounded outline-none font-bold text-sm text-gray-700 focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+
+                <!-- Cards do Dia Selecionado -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-gray-800 text-white p-4 rounded-xl shadow-sm">
+                        <p class="text-xs text-gray-400 font-bold uppercase">Faturamento no Dia Escolhido</p>
+                        <p id="planilha-fat-dia" class="text-xl font-bold">R$ 0,00</p>
+                    </div>
+                    <div class="bg-gray-800 text-white p-4 rounded-xl shadow-sm">
+                        <p class="text-xs text-gray-400 font-bold uppercase">Custo de Peças Descontado</p>
+                        <p id="planilha-custo-dia" class="text-xl font-bold text-red-400">R$ 0,00</p>
+                    </div>
+                    <div class="bg-blue-900 text-white p-4 rounded-xl shadow-sm">
+                        <p class="text-xs text-blue-300 font-bold uppercase">Lucro Líquido Obtido</p>
+                        <p id="planilha-lucro-dia" class="text-xl font-bold text-green-400">R$ 0,00</p>
+                    </div>
+                </div>
+
+                <!-- Planilha Gerencial com Botão de Impressão Completa -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-sm font-bold text-gray-700 uppercase">Relação Completa de Registros (Histórico Geral)</h3>
+                        <button onclick="gerarRelatorioGerencial()" class="bg-gray-900 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-black transition">
+                            Imprimir Planilha de Lucros (PDF)
+                        </button>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="bg-gray-100 border-b border-gray-300 font-bold text-gray-700 uppercase">
+                                    <th class="p-2">Data</th>
+                                    <th class="p-2">Cliente</th>
+                                    <th class="p-2">Status</th>
+                                    <th class="p-2">Mão de Obra</th>
+                                    <th class="p-2">Custo Peça</th>
+                                    <th class="p-2">Total Bruto</th>
+                                    <th class="p-2 text-green-600">Lucro Real</th>
+                                </tr>
+                            </thead>
+                            <tbody id="corpoPlanilhaGeral" class="divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ABA 5: CALENDÁRIO DE GARANTIAS (3 MESES) -->
+            <section id="garantias" class="tab-content hidden space-y-6">
+                <h2 class="text-xl font-bold border-b pb-2 text-blue-600">Acompanhamento Automático de Prazos de Garantia</h2>
+                <p class="text-xs text-gray-500">Monitore aqui o período legal de **3 meses (90 dias)** calculado para os aparelhos cujo status está como <strong>"Realizado / Concluído"</strong>.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="listaGarantias"></div>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- LOGICA E CORE DO APLICATIVO -->
+    <script>
+        // Armazenamento estruturado no LocalStorage para permanência permanente dos dados
+        let bancoClientes = JSON.parse(localStorage.getItem('jvcell_clientes')) || [];
+        let bancoOS = JSON.parse(localStorage.getItem('jvcell_os')) || [];
+
+        // Inicializador de datas padrões
+        const hojeIso = new Date().toISOString().split('T')[0];
+        document.getElementById('osData').value = hojeIso;
+        document.getElementById('buscaPlanilhaData').value = hojeIso;
+
+        // --- CONTROLE DE ACESSO E VALIDAÇÃO DE LOGIN ---
+        function autenticar(e) {
+            e.preventDefault();
+            const usuario = document.getElementById('loginUser').value.trim();
+            const senha = document.getElementById('loginPassword').value;
+
+            // Credenciais solicitadas pelo proprietário
+            if (usuario === "jvcell@gmail.com" && senha === "Aylla2605..") {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainSystem').classList.remove('hidden');
+                sincronizarDados();
+            } else {
+                const erroBox = document.getElementById('loginErro');
+                erroBox.classList.remove('hidden');
+                setTimeout(() => erroBox.classList.add('hidden'), 3500);
+            }
+        }
+
+        function deslogar() {
+            document.getElementById('loginForm').reset();
+            document.getElementById('mainSystem').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+        }
+
+        // --- SISTEMA DINÂMICO DE ALTERNÂNCIA DE ABAS ---
+        function showSection(id) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-blue-800'));
+            
+            document.getElementById(id).classList.remove('hidden');
+            event.currentTarget.classList.add('bg-blue-800');
+
+            sincronizarDados();
+        }
+
+        function sincronizarDados() {
+            atualizarResumosHome();
+            renderizarClientes();
+            atualizarSelectClientes();
+            renderizarOS();
+            renderizarPlanilhaGeral();
+            atualizarPlanilhaFiltrada();
+            listarGarantias();
+        }
+
+        // --- FUNÇÕES DA ABA CLIENTES ---
+        function salvarCliente(e) {
+            e.preventDefault();
+            const novo = {
+                id: Date.now(),
+                nome: document.getElementById('cNome').value.trim(),
+                telefone: document.getElementById('cTelefone').value.trim()
+            };
+            bancoClientes.push(novo);
+            localStorage.setItem('jvcell_clientes', JSON.stringify(bancoClientes));
+            document.getElementById('clienteForm').reset();
+            sincronizarDados();
+        }
+
+        function deletarCliente(id) {
+            if(confirm('Tem certeza de que deseja remover este cliente permanentemente?')) {
+                bancoClientes = bancoClientes.filter(c => c.id !== id);
+                localStorage.setItem('jvcell_clientes', JSON.stringify(bancoClientes));
+                sincronizarDados();
+            }
+        }
+
+        function renderizarClientes() {
+            const tbody = document.getElementById('tabelaClientes');
+            tbody.innerHTML = '';
+            bancoClientes.forEach(c => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-3 font-bold text-gray-900">${c.nome}</td>
+                        <td class="p-3 text-gray-600">${c.telefone}</td>
+                        <td class="p-3 text-center">
+                            <button onclick="deletarCliente(${c.id})" class="text-xs bg-red-100 text-red-600 font-bold px-2 py-1 rounded hover:bg-red-200">Excluir</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function atualizarSelectClientes() {
+            const select = document.getElementById('osCliente');
+            select.innerHTML = '<option value="">-- Selecione --</option>';
+            bancoClientes.forEach(c => {
+                select.innerHTML += `<option value="${c.nome}" data-tel="${c.telefone}">${c.nome}</option>`;
+            });
+        }
+
+        // --- FUNÇÕES DA ABA ORDENS DE SERVIÇO ---
+        function salvarOS(e) {
+            e.preventDefault();
+            const selectEl = document.getElementById('osCliente');
+            const tel = selectEl.options[selectEl.selectedIndex].getAttribute('data-tel') || '';
+
+            const novaOS = {
+                id: Date.now(),
+                cliente: selectEl.value,
+                telefone: tel,
+                aparelho: document.getElementById('osAparelho').value,
+                maoObra: parseFloat(document.getElementById('osMaoObra').value) || 0,
+                peca: parseFloat(document.getElementById('osPeca').value) || 0,
+                status: document.getElementById('osStatus').value,
+                data: document.getElementById('osData').value
+            };
+
+            bancoOS.push(novaOS);
+            localStorage.setItem('jvcell_os', JSON.stringify(bancoOS));
+            document.getElementById('osForm').reset();
+            document.getElementById('osData').value = hojeIso;
+            sincronizarDados();
+            alert('Ordem de Serviço incluída com sucesso!');
+        }
+
+        function mudarStatus(id, novoStatus) {
+            bancoOS = bancoOS.map(o => {
+                if(o.id === id) o.status = novoStatus;
+                return o;
+            });
+            localStorage.setItem('jvcell_os', JSON.stringify(bancoOS));
+            sincronizarDados();
+        }
+
+        function deletarOS(id) {
+            if(confirm('Excluir esta ordem de serviço definitivamente?')) {
+                bancoOS = bancoOS.filter(o => o.id !== id);
+                localStorage.setItem('jvcell_os', JSON.stringify(bancoOS));
+                sincronizarDados();
+            }
+        }
+
+        function renderizarOS() {
+            const tbody = document.getElementById('tabelaOS');
+            tbody.innerHTML = '';
+
+            bancoOS.forEach(o => {
+                const total = o.maoObra + o.peca;
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-3 font-bold text-gray-900">${o.cliente}</td>
+                        <td class="p-3 text-gray-600">${o.aparelho}</td>
+                        <td class="p-3">
+                            <select onchange="mudarStatus(${o.id}, this.value)" class="p-1 text-xs border rounded bg-white font-semibold">
+                                <option value="Orçamento" ${o.status === 'Orçamento' ? 'selected' : ''}>Orçamento</option>
+                                <option value="Aprovado" ${o.status === 'Aprovado' ? 'selected' : ''}>Aprovado</option>
+                                <option value="Realizado" ${o.status === 'Realizado' ? 'selected' : ''}>Realizado / Concluído</option>
+                            </select>
+                        </td>
+                        <td class="p-3 font-bold text-gray-700">R$ ${total.toFixed(2)}</td>
+                        <td class="p-3 text-center space-x-1 whitespace-nowrap">
+                            <button onclick="gerarReciboCliente(${o.id})" class="text-xs bg-blue-600 text-white px-2 py-1 rounded font-bold hover:bg-blue-700">Gerar Recibo</button>
+                            <button onclick="deletarOS(${o.id})" class="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded hover:bg-gray-300">Excluir</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // --- ABA 4: PLANILHA E CONTROLE DE FILTRO SELECIONADO ---
+        function renderizarPlanilhaGeral() {
+            const tbody = document.getElementById('corpoPlanilhaGeral');
+            tbody.innerHTML = '';
+            bancoOS.forEach(o => {
+                const total = o.maoObra + o.peca;
+                const lucro = o.maoObra; // Lucro é igual ao total bruto menos o valor da peça (ou seja, a mão de obra)
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-2 text-gray-500">${o.data.split('-').reverse().join('/')}</td>
+                        <td class="p-2 font-semibold">${o.cliente}</td>
+                        <td class="p-2"><span class="px-1 py-0.5 rounded text-[10px] font-bold ${o.status === 'Realizado' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">${o.status}</span></td>
+                        <td class="p-2">R$ ${o.maoObra.toFixed(2)}</td>
+                        <td class="p-2 text-red-500">R$ ${o.peca.toFixed(2)}</td>
+                        <td class="p-2 font-bold">R$ ${total.toFixed(2)}</td>
+                        <td class="p-2 text-green-600 font-bold">R$ ${lucro.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function atualizarPlanilhaFiltrada() {
+            const dataFiltro = document.getElementById('buscaPlanilhaData').value;
+            const itensDoDia = bancoOS.filter(o => o.data === dataFiltro);
+
+            let fatDia = 0, custoDia = 0;
+            itensDoDia.forEach(o => {
+                fatDia += (o.maoObra + o.peca);
+                custoDia += o.peca;
+            });
+
+            document.getElementById('planilha-fat-dia').innerText = `R$ ${fatDia.toFixed(2)}`;
+            document.getElementById('planilha-custo-dia').innerText = `R$ ${custoDia.toFixed(2)}`;
+            document.getElementById('planilha-lucro-dia').innerText = `R$ ${(fatDia - custoDia).toFixed(2)}`;
+        }
+
+        // --- GERADOR DE COMPROVANTES EM PDF (REGRAS ESPECÍFICAS) ---
+        function gerarReciboCliente(id) {
+            const o = bancoOS.find(item => item.id === id);
+            if(!o) return;
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const total = o.maoObra + o.peca;
+
+            // Cabeçalho da assistência
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(22);
+            doc.text("JV CELL - ASSISTÊNCIA TÉCNICA", 20, 25);
+            
+            doc.setFontSize(10);
+            doc.setFont("Helvetica", "normal");
+            doc.text("Soluções Avançadas e Reparos de Smartphones", 20, 32);
+            doc.text(`Comprovante emitido em: ${new Date().toLocaleDateString('pt-BR')}`, 20, 37);
+            doc.line(20, 42, 190, 42);
+
+            doc.setFontSize(12);
+            doc.setFont("Helvetica", "bold");
+            doc.text("RECIBO DE PRESTAÇÃO DE SERVIÇO", 20, 52);
+
+            doc.setFont("Helvetica", "normal");
+            doc.text(`Cliente: ${o.cliente}`, 20, 62);
+            doc.text(`Telefone: ${o.telefone || 'Não Fornecido'}`, 20, 70);
+            doc.text(`Equipamento: ${o.aparelho}`, 20, 78);
+            doc.text(`Entrada em: ${o.data.split('-').reverse().join('/')}`, 20, 86);
+            doc.line(20, 94, 190, 94);
+
+            doc.setFont("Helvetica", "bold");
+            doc.text("Detalhamento:", 20, 105);
+            doc.setFont("Helvetica", "normal");
+            doc.text("Mão de obra qualificada aplicada na troca de componentes internos do dispositivo.", 20, 113);
+            
+            // Regra rígida definida pelo usuário: Ocultar valores fragmentados (peça e mão de obra) exibindo apenas o TOTAL
+            doc.setFontSize(14);
+            doc.setFont("Helvetica", "bold");
+            doc.text(`VALOR TOTAL A PAGAR: R$ ${total.toFixed(2)}`, 20, 135);
+
+            doc.line(20, 145, 190, 145);
+            doc.setFontSize(9);
+            doc.setFont("Helvetica", "italic");
+            doc.text("Termo: Garantia legal de 3 meses (90 dias) exclusiva sobre os itens substituídos.", 20, 155);
+            doc.text("A garantia será anulada em casos de quedas, oxidação por água ou violação de lacres.", 20, 160);
+
+            doc.line(20, 200, 90, 200);
+            doc.text("Assinatura do Técnico", 25, 205);
+            doc.line(120, 200, 190, 200);
+            doc.text("Assinatura do Cliente", 130, 205);
+
+            doc.save(`Recibo_JVCELL_${o.cliente.replace(/\s+/g, '_')}.pdf`);
+        }
+
+        // --- IMPRESSÃO COMPLETA DO RELATÓRIO INTERNO (LUCRO REAL) ---
+        function gerarRelatorioGerencial() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFont("Helvetica", "bold");
+            doc.text("RELATÓRIO DE FECHAMENTO E LUCRO - JV CELL", 20, 20);
+            doc.setFontSize(10);
+            doc.setFont("Helvetica", "normal");
+            doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 20, 27);
+            doc.line(20, 32, 190, 32);
+
+            let y = 42;
+            let brutoTotal = 0, pecasTotal = 0, lucroTotal = 0;
+
+            doc.setFont("Helvetica", "bold");
+            doc.text("Cliente / Aparelho", 20, y);
+            doc.text("Total Bruto", 120, y);
+            doc.text("Custo Peça", 145, y);
+            doc.text("Lucro Líq.", 170, y);
+            y += 8;
+            doc.line(20, y-4, 190, y-4);
+
+            doc.setFont("Helvetica", "normal");
+            bancoOS.forEach(o => {
+                const totalItem = o.maoObra + o.peca;
+                const lucroItem = o.maoObra; 
+
+                brutoTotal += totalItem;
+                pecasTotal += o.peca;
+                lucroTotal += lucroItem;
+
+                if(y > 270) { doc.addPage(); y = 20; }
+                doc.text(`${o.cliente} - ${o.aparelho.substring(0,25)}`, 20, y);
+                doc.text(`R$ ${totalItem.toFixed(2)}`, 120, y);
+                doc.text(`R$ ${o.peca.toFixed(2)}`, 145, y);
+                doc.text(`R$ ${lucroItem.toFixed(2)}`, 170, y);
+                y += 8;
+            });
+
+            doc.line(20, y, 190, y);
+            y += 10;
+            doc.setFont("Helvetica", "bold");
+            doc.text(`Faturamento Geral Bruto: R$ ${brutoTotal.toFixed(2)}`, 20, y);
+            doc.text(`Total de Custo em Peças (Descontos): R$ ${pecasTotal.toFixed(2)}`, 20, y+6);
+            doc.text(`LUCRO REAL LÍQUIDO CONSOLIDADO: R$ ${lucroTotal.toFixed(2)}`, 20, y+12);
+
+            doc.save("Planilha_Financeira_JVCELL.pdf");
+        }
+
+        // --- ABA 5: CALENDÁRIO VISUAL DE GARANTIAS (3 MESES) ---
+        function listarGarantias() {
+            const container = document.getElementById('listaGarantias');
+            container.innerHTML = '';
+            const concluidos = bancoOS.filter(o => o.status === 'Realizado');
+
+            if(concluidos.length === 0) {
+                container.innerHTML = '<p class="text-sm text-gray-400 col-span-3 font-medium">Nenhuma ordem concluída para monitoramento de prazo.</p>';
+                return;
+            }
+
+            concluidos.forEach(o => {
+                const dataBase = new Date(o.data + 'T00:00:00');
+                dataBase.setMonth(dataBase.getMonth() + 3); // Cálculo exato da garantia contratual de 3 meses
+
+                const hoje = new Date();
+                const diffDias = Math.ceil((dataBase - hoje) / (1000 * 60 * 60 * 24));
+                
+                let estiloCard = 'border-green-200 bg-green-50 text-green-800';
+                let statusTexto = `${diffDias} Dias Restantes`;
+
+                if(diffDias <= 0) {
+                    estiloCard = 'border-red-200 bg-red-50 text-red-800';
+                    statusTexto = 'Garantia Expirada';
+                } else if(diffDias <= 15) {
+                    estiloCard = 'border-amber-200 bg-amber-50 text-amber-800';
+                }
+
+                container.innerHTML += `
+                    <div class="p-4 border rounded-xl shadow-sm ${estiloCard} flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-bold text-gray-900">${o.cliente}</h4>
+                            <p class="text-xs text-gray-700 font-medium">Dispositivo: ${o.aparelho}</p>
+                            <p class="text-xs text-gray-500 mt-2">Expira em: <span class="font-bold text-gray-800">${dataBase.toLocaleDateString('pt-BR')}</span></p>
+                        </div>
+                        <div class="text-right mt-3">
+                            <span class="text-[10px] uppercase font-black tracking-wider px-2 py-0.5 border border-current rounded">${statusTexto}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // --- RENDERIZAÇÃO AUTOMÁTICA DO RESUMO DIÁRIO E GRÁFICOS (HOME) ---
+        let dChart = null;
+        let mChart = null;
+
+        function atualizarResumosHome() {
+            // Coleta dados automáticos baseados no dia atual do calendário local
+            const registrosHoje = bancoOS.filter(o => o.data === hojeIso);
+
+            let faturamento = 0, custos = 0;
+            registrosHoje.forEach(o => {
+                faturamento += (o.maoObra + o.peca);
+                custos += o.peca;
+            });
+
+            document.getElementById('fat-hoje').innerText = `R$ ${faturamento.toFixed(2)}`;
+            document.getElementById('custo-hoje').innerText = `R$ ${custos.toFixed(2)}`;
+            document.getElementById('lucro-hoje').innerText = `R$ ${(faturamento - custos).toFixed(2)}`;
+
+            renderizarGraficosDinâmicos();
+        }
+
+        function renderizarGraficosDinâmicos() {
+            const rotulosDias = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+            const ultimos7Dias = Array.from({length: 7}, (_, i) => {
+                const d = new Date(); d.setDate(d.getDate() - i); return d.toISOString().split('T')[0];
+            }).reverse();
+
+            const faturamentosDiarios = ultimos7Dias.map(dt => bancoOS.filter(o => o.data === dt).reduce((acc, curr) => acc + (curr.maoObra + curr.peca), 0));
+            const labelsFormatados = ultimos7Dias.map(dt => { const d = new Date(dt + 'T00:00:00'); return `${rotulosDias[d.getDay()]} (${d.getDate()}/${d.getMonth()+1})`; });
+
+            if(dChart) dChart.destroy();
+            if(mChart) mChart.destroy();
+
+            dChart = new Chart(document.getElementById('chartDiario').getContext('2d'), {
+                type: 'bar',
+                data: { labels: labelsFormatados, datasets: [{ label: 'Faturamento Bruto R$', data: faturamentosDiarios, backgroundColor: '#2563eb', borderRadius: 6 }] },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            });
+
+            const listaMeses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+            const faturamentosMensais = Array(12).fill(0);
+            bancoOS.forEach(o => { const m = new Date(o.data + 'T00:00:00').getMonth(); faturamentosMensais[m] += (o.maoObra + o.peca); });
+
+            mChart = new Chart(document.getElementById('chartMensal').getContext('2d'), {
+                type: 'line',
+                data: { labels: listaMeses, datasets: [{ label: 'Performance Mensal R$', data: faturamentosMensais, borderColor: '#16a34a', backgroundColor: 'rgba(22, 163, 74, 0.05)', fill: true, tension: 0.2 }] },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            });
+        }
+    </script>
+</body>
+</html>
