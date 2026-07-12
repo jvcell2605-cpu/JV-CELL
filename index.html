@@ -1,761 +1,464 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JV CELL - Gestão Avançada</title>
-    <!-- Tailwind CSS para Design de Aplicativo Premium -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Chart.js para os Gráficos de Desempenho -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- jsPDF para a Emissão dos Recibos e Planilhas -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-</head>
-<body class="bg-gray-100 text-gray-800 font-sans antialiased">
-
-    <!-- TELA DE LOGIN PRIVADA -->
-    <div id="loginScreen" class="fixed inset-0 bg-slate-900 flex flex-col items-center justify-center z-50 p-4">
-        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md space-y-6 border border-gray-100">
-            <!-- ÍCONE DO APP CENTRALIZADO NO LOGIN -->
-            <div class="flex flex-col items-center justify-center mb-2">
-                <div class="w-24 h-24 bg-slate-900 rounded-2xl flex items-center justify-center p-2 shadow-xl border-2 border-blue-500 relative">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" class="w-full h-full">
-                        <rect x="50" y="20" width="140" height="200" rx="20" fill="#1e293b" stroke="#2563eb" stroke-width="6"/>
-                        <rect x="60" y="35" width="120" height="170" rx="10" fill="#0b0f19"/>
-                        <circle cx="120" cy="28" r="3" fill="#475569"/>
-                        <g stroke="#d97706" stroke-width="4" fill="none" opacity="0.6">
-                            <circle cx="120" cy="120" r="30" stroke-dasharray="10 6"/>
-                        </g>
-                        <path d="M70,170 L105,135" stroke="#f59e0b" stroke-width="7" stroke-linecap="round"/>
-                        <path d="M65,175 L75,165" stroke="#94a3b8" stroke-width="9" stroke-linecap="round"/>
-                        <text x="120" y="112" font-family="Arial, sans-serif" font-weight="900" font-size="32" fill="#ffffff" text-anchor="middle">JV</text>
-                        <text x="120" y="142" font-family="Arial, sans-serif" font-weight="900" font-size="26" fill="#60a5fa" text-anchor="middle">CEL</text>
-                    </svg>
-                    <span class="absolute -top-1 -right-1 flex h-4 w-4">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-4 w-4 bg-green-500"></span>
-                    </span>
-                </div>
-                <h1 class="text-3xl font-extrabold text-blue-600 tracking-wider mt-3">JV CELL</h1>
-                <p class="text-sm text-gray-500 mt-1">Gerenciamento Técnico & Lucros</p>
-            </div>
-
-            <form id="loginForm" onsubmit="autenticar(event)" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">E-mail corporativo</label>
-                    <input type="email" id="loginUser" required placeholder="jvcell@gmail.com" class="w-full p-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Senha de Acesso</label>
-                    <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full p-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <button type="submit" class="w-full bg-blue-600 text-white p-2.5 rounded-lg font-bold hover:bg-blue-700 transition shadow-md">
-                    Entrar no Painel
-                </button>
-            </form>
-            <p id="loginErro" class="text-center text-sm text-red-600 font-bold hidden">E-mail ou senha incorretos!</p>
-        </div>
-    </div>
-
-    <!-- SISTEMA PRINCIPAL -->
-    <div id="mainSystem" class="hidden">
+    <title>Controle de OS e Combustível</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 15px; background-color: #f4f4f9; max-width: 600px; margin: auto; }
+        .bloco { background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        input, button, select { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .tabs { display: flex; gap: 5px; margin-bottom: 15px; }
+        .tabs button { flex: 1; padding: 10px; cursor: pointer; border: none; background: #6c757d; color: white; border-radius: 4px; }
+        .tabs button.active { background: #007bff; }
+        .aba-conteudo { display: none; }
+        .aba-conteudo.active { display: block; }
+        button { font-weight: bold; cursor: pointer; }
+        .btn-filtro { background-color: #007bff; color: white; }
+        .btn-ver { background-color: #17a2b8; color: white; padding: 8px; font-size: 0.9em; width: 100%; }
+        .btn-print { background-color: #28a745; color: white; padding: 8px; font-size: 0.9em; width: 100%; margin-top: 10px; }
+        .btn-edit { background-color: #ffc107; color: black; padding: 5px; font-size: 0.7em; }
+        .btn-del { background-color: #dc3545; color: white; padding: 5px; font-size: 0.7em; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; font-size: 0.8em; }
+        th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
+        th { background-color: #f8f8f8; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000; }
+        .modal img { max-width: 90%; max-height: 80%; border: 2px solid white; }
+        .holerite { font-family: 'Courier New', Courier, monospace; border: 2px solid #000; padding: 15px; background: #fff; margin-top: 10px; margin-bottom: 20px; font-size: 0.9em; }
         
-        <!-- HEADER / MENU SUPERIOR -->
-        <nav class="bg-blue-600 text-white p-4 shadow-lg sticky top-0 z-40">
-            <div class="container mx-auto flex flex-col lg:flex-row justify-between items-center gap-4">
-                <div class="flex items-center gap-3 justify-between w-full lg:w-auto">
-                    <div class="flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" class="w-10 h-10 drop-shadow-md">
-                            <rect x="50" y="20" width="140" height="200" rx="20" fill="#1e293b" stroke="#ffffff" stroke-width="6"/>
-                            <rect x="60" y="35" width="120" height="170" rx="10" fill="#0f172a"/>
-                            <path d="M75,165 L105,135" stroke="#f59e0b" stroke-width="6" stroke-linecap="round"/>
-                            <text x="120" y="115" font-family="Arial, sans-serif" font-weight="900" font-size="28" fill="#ffffff" text-anchor="middle">JV</text>
-                            <text x="120" y="142" font-family="Arial, sans-serif" font-weight="900" font-size="24" fill="#3b82f6" text-anchor="middle">CEL</text>
-                        </svg>
-                        <h1 class="text-xl font-black tracking-widest">JV CELL</h1>
-                    </div>
-                    <button onclick="deslogar()" class="lg:hidden text-xs bg-red-500 px-2 py-1 rounded font-bold">Sair</button>
-                </div>
-                <div class="flex flex-wrap gap-1.5 justify-center">
-                    <button onclick="showSection('dashboard')" class="nav-btn bg-blue-800 px-3 py-2 rounded-lg text-sm font-semibold transition">Início / Gráficos</button>
-                    <button onclick="showSection('clientes')" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition hover:bg-blue-700">Adicionar Clientes</button>
-                    <button onclick="showSection('os')" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition hover:bg-blue-700">Ordens de Serviço</button>
-                    <button onclick="showSection('planilha')" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition hover:bg-blue-700">Planilha de Desempenho</button>
-                    <button onclick="showSection('garantias')" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition hover:bg-blue-700">Garantias (3M)</button>
-                    <button onclick="deslogar()" class="hidden lg:block bg-red-500 px-3 py-2 rounded-lg text-sm font-semibold hover:bg-red-600 transition shadow">Sair</button>
-                </div>
-            </div>
-        </nav>
+        /* Estilo para garantir que apenas o holerite saia na impressão */
+        @media print {
+    /* Esconde tudo */
+    body > *:not(.print-alvo) {
+        display: none !important;
+    }
+    
+    /* Garante que o alvo da impressão apareça */
+    .print-alvo {
+        display: block !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+    
+    .btn-print {
+        display: none !important;
+    }
+}
 
-        <div class="container mx-auto p-4 md:p-6 space-y-6">
+    </style>
+</head>
+<body>
+<div class="tabs">
+    <button class="active" onclick="trocarAba('abaOS', this)">OS</button>
+    <button onclick="trocarAba('abaComb', this)">Combustível</button>
+    <button onclick="trocarAba('abaRel', this)">Relatório</button>
+    <button onclick="trocarAba('abaPag', this)">Fechamento</button>
+</div>
 
-            <!-- ABA 1: DIÁRIO E GRÁFICOS -->
-            <section id="dashboard" class="tab-content space-y-6">
-                <div class="border-b pb-2 flex justify-between items-center">
-                    <h2 class="text-xl font-bold text-gray-800">Resumo Automatizado (Hoje)</h2>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-green-500">
-                        <p class="text-xs text-gray-400 font-bold uppercase">Faturamento Diário</p>
-                        <p id="fat-hoje" class="text-2xl font-bold text-gray-800">R$ 0,00</p>
-                    </div>
-                    <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-red-500">
-                        <p class="text-xs text-gray-400 font-bold uppercase">Custo de Peças Descontado</p>
-                        <p id="custo-hoje" class="text-2xl font-bold text-gray-800">R$ 0,00</p>
-                    </div>
-                    <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-blue-500">
-                        <p class="text-xs text-gray-400 font-bold uppercase">Lucro Líquido Real</p>
-                        <p id="lucro-hoje" class="text-2xl font-bold text-blue-600">R$ 0,00</p>
-                    </div>
-                </div>
+<div id="abaOS" class="aba-conteudo active">
+    <div class="bloco">
+        <h2>Nova Ordem de Serviço</h2>
+        <input type="text" id="sa" placeholder="Número da SA">
+        <input type="text" id="cliente" placeholder="Nome do Cliente">
+        <input type="text" id="servico" placeholder="Tipo de Serviço">
+        <input type="number" id="valorOS" value="70.00" placeholder="Valor do Serviço (R$)">
+        <input type="date" id="data">
+        <label>Foto Casa:</label> <input type="file" id="fotoCasa" accept="image/*">
+        <label>Foto Aparelho:</label> <input type="file" id="fotoAparelho" accept="image/*">
+        <input type="hidden" id="editIndex" value="">
+        <button id="btnSalvar" onclick="salvarOS()" style="background-color: #28a745; color: white;">Salvar Serviço</button>
+    </div>
+    <input type="text" id="buscaSA" placeholder="🔍 Pesquisar por SA..." onkeyup="pesquisarSA()">
+    <table>
+        <thead><tr><th>Data</th><th>SA</th><th>Cliente</th><th>Serviço</th><th>Valor</th><th>Fotos</th><th>Ações</th></tr></thead>
+        <tbody id="tabelaOS"></tbody>
+    </table>
+</div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                        <h3 class="text-sm font-bold text-gray-500 mb-4 uppercase">Histórico Diário de Caixas (Últimos 7 dias)</h3>
-                        <canvas id="chartDiario" class="w-full max-h-64"></canvas>
-                    </div>
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                        <h3 class="text-sm font-bold text-gray-500 mb-4 uppercase">Faturamento Mensal Consolidado</h3>
-                        <canvas id="chartMensal" class="w-full max-h-64"></canvas>
-                    </div>
-                </div>
-            </section>
+<div id="abaComb" class="aba-conteudo">
+    <div class="bloco">
+        <h2>Controle de Combustível</h2>
+        <input type="date" id="dataComb">
+        <input type="number" id="kmComb" placeholder="KM Atual">
+        <input type="number" id="valorComb" placeholder="Valor (R$)">
+        <button onclick="salvarCombustivel()" style="background-color: #28a745; color: white;">Salvar</button>
+    </div>
+    <table>
+        <thead><tr><th>Data</th><th>KM</th><th>Valor</th><th>Ações</th></tr></thead>
+        <tbody id="tabelaComb"></tbody>
+    </table>
+</div>
 
+<div id="abaRel" class="aba-conteudo">
+    <div class="bloco">
+        <h2>Relatório por Ciclo</h2>
+        <select id="filtroCicloRel" onchange="gerarRelatorio()">
+            <option value="todos">Todos os Registros</option>
+            <option value="c1">Ciclo 26 a 10</option>
+            <option value="c2">Ciclo 11 a 25</option>
+        </select>
+        <input type="number" id="anoRel" placeholder="Ano (ex: 2026)" onkeyup="gerarRelatorio()" style="margin-top:10px;">
+        <select id="mesRel" onchange="gerarRelatorio()">
+            <option value="0">Janeiro</option><option value="1">Fevereiro</option><option value="2">Março</option>
+            <option value="3">Abril</option><option value="4">Maio</option><option value="5">Junho</option>
+            <option value="6">Julho</option><option value="7">Agosto</option><option value="8">Setembro</option>
+            <option value="9">Outubro</option><option value="10">Novembro</option><option value="11">Dezembro</option>
+        </select>
+        <div id="resumoMeta" style="margin-top: 15px; padding: 10px; background: #e9ecef; border-radius: 5px;"></div>
+        <table><thead><tr><th>Data</th><th>Qtd Serviços</th></tr></thead><tbody id="corpoRelatorio"></tbody></table>
+    </div>
+</div>
 
-            <!-- ABA 2: CADASTRO DE CLIENTES -->
-            <section id="clientes" class="tab-content hidden space-y-6">
-                <h2 class="text-xl font-bold border-b pb-2 text-blue-600">Área de Clientes</h2>
-                
-                <form id="clienteForm" onsubmit="salvarCliente(event)" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Nome Completo do Cliente *</label>
-                        <input type="text" id="cNome" required class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">WhatsApp / Contato *</label>
-                        <input type="text" id="cTelefone" placeholder="(00) 00000-0000" required class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    <div class="md:col-span-3 text-right">
-                        <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-700 transition">
-                            Cadastrar Novo Cliente
-                        </button>
-                    </div>
-                </form>
+<div id="abaPag" class="aba-conteudo">
+    <div class="bloco">
+        <h2>Fechamento Quinzenal</h2>
+        <input type="number" id="anoPag" placeholder="Ano (ex: 2026)">
+        <select id="mesPag" onchange="calcularFechamentoTotal()">
+            <option value="0">Janeiro</option><option value="1">Fevereiro</option><option value="2">Março</option>
+            <option value="3">Abril</option><option value="4">Maio</option><option value="5">Junho</option>
+            <option value="6">Julho</option><option value="7">Agosto</option><option value="8">Setembro</option>
+            <option value="9">Outubro</option><option value="10">Novembro</option><option value="11">Dezembro</option>
+        </select>
+        <button class="btn-filtro" onclick="calcularFechamentoTotal()">Recalcular Fechamento</button>
+    </div>
+    <div class="bloco" id="resultadoPag" style="display:none;">
+        <h3>Ciclo: 26 a 10</h3>
+        <div style="line-height: 2;">
+            <div>Dias trabalhados: <span id="diasQ1"></span></div>
+            <div>Serviços: <span id="resQ1"></span></div>
+            <div>Receita: <span id="valQ1"></span></div>
+            <div>Gasto Comb: <span id="combQ1"></span></div>
+            <div><strong>Lucro: <span id="lucroQ1" style="color:green;"></span></strong></div>
+        </div>
+        <button class="btn-ver" onclick="toggleDetalhes('detalhesQ1')" style="margin-top:10px;">Ver Holerite</button>
+        <div id="detalhesQ1" class="holerite" style="display:none;"></div>
+        <hr style="margin: 20px 0;">
+        <h3>Ciclo: 11 a 25</h3>
+        <div style="line-height: 2;">
+            <div>Dias trabalhados: <span id="diasQ2"></span></div>
+            <div>Serviços: <span id="resQ2"></span></div>
+            <div>Receita: <span id="valQ2"></span></div>
+            <div>Gasto Comb: <span id="combQ2"></span></div>
+            <div><strong>Lucro: <span id="lucroQ2" style="color:green;"></span></strong></div>
+        </div>
+        <button class="btn-ver" onclick="toggleDetalhes('detalhesQ2')" style="margin-top:10px;">Ver Holerite</button>
+        <div id="detalhesQ2" class="holerite" style="display:none;"></div>
+    </div>
+</div>
 
-                <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-                    <div class="p-4 bg-gray-50 text-xs font-medium text-gray-500 italic">💡 Clique em cima do nome de um cliente para ver o histórico de ordens dele.</div>
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-gray-100 border-b border-gray-200 text-gray-600 text-xs uppercase font-bold tracking-wider">
-                                <th class="p-3">Nome do Cliente (Clique para Ver Histórico)</th>
-                                <th class="p-3">Contato</th>
-                                <th class="p-3 text-center">Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabelaClientes" class="divide-y divide-gray-100 text-sm"></tbody>
-                    </table>
-                </div>
-            </section>
+<div id="modalFoto" class="modal" onclick="this.style.display='none'"><img id="imgVisualizar" src=""></div>
 
+<script>
+    const firebaseConfig = { apiKey: "AIzaSyBcSTu5r-wyOsLLbMqXBnU5vEP-PFzc5Jk", authDomain: "controle-desktop.firebaseapp.com", projectId: "controle-desktop", storageBucket: "controle-desktop.firebasestorage.app", messagingSenderId: "478507836867", appId: "1:478507836867:web:17a5ad8c9ebf7d292b8976" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    let listaOS = [], listaComb = [];
 
-            <!-- ABA 3: ORDENS DE SERVIÇO (O.S) -->
-            <section id="os" class="tab-content hidden space-y-6">
-                <h2 class="text-xl font-bold border-b pb-2 text-blue-600">Abertura de Serviços & Orçamentos</h2>
-                
-                <form id="osForm" onsubmit="salvarOS(event)" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Cliente Vinculado *</label>
-                        <select id="osCliente" required class="w-full p-2 border rounded bg-white outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">-- Escolha --</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Aparelho *</label>
-                        <input type="text" id="osAparelho" placeholder="Ex: iPhone 11 ou Moto G52" required class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Serviço Realizado / Problema *</label>
-                        <input type="text" id="osServico" placeholder="Ex: Troca de conector de carga" required class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Mão de Obra (R$)</label>
-                        <input type="number" step="0.01" id="osMaoObra" value="0.00" class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Valor das Peças (R$)</label>
-                        <input type="number" step="0.01" id="osPeca" value="0.00" class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Status do Serviço</label>
-                        <select id="osStatus" class="w-full p-2 border rounded bg-white outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="Orçamento">Orçamento</option>
-                            <option value="Aprovado">Aprovado / Em Reparo</option>
-                            <option value="Realizado">Realizado / Concluído</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Data de Entrega / Entrada</label>
-                        <input type="date" id="osData" required class="w-full p-2 border rounded outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    <div class="md:col-span-2 text-right pt-6">
-                        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition">
-                            Gravar Ordem de Serviço
-                        </button>
-                    </div>
-                </form>
+    // --- NOVA FUNÇÃO DE IMPRESSÃO ---
+        // --- FUNÇÃO DE IMPRESSÃO CORRIGIDA ---
+       // --- FUNÇÃO DE IMPRESSÃO CORRIGIDA E ROBUSTA ---
+                   function imprimirHolerite(idElemento) {
+        const conteudo = document.getElementById(idElemento).innerHTML;
+        
+        // Cria um iframe oculto para isolar o conteúdo
+        let iframe = document.createElement('iframe');
+        iframe.style.position = 'fixed';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = '0';
+        document.body.appendChild(iframe);
 
-                <div class="bg-white rounded-xl shadow-sm overflow-x-auto border border-gray-100">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-gray-50 border-b border-gray-200 text-gray-600 text-xs uppercase font-bold tracking-wider">
-                                <th class="p-3">Cliente</th>
-                                <th class="p-3">Aparelho / Serviço</th>
-                                <th class="p-3">Alterar Status</th>
-                                <th class="p-3">Total Bruto</th>
-                                <th class="p-3 text-center">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabelaOS" class="divide-y divide-gray-100 text-sm"></tbody>
-                    </table>
-                </div>
-            </section>
+        // Escreve o conteúdo no iframe
+        let doc = iframe.contentWindow.document;
+        doc.open();
+        doc.write(`
+            <html>
+            <head>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; color: #000; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                    th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+                    .btn-print { display: none; }
+                    /* Força a quebra de página */
+                    .quebra-pagina { page-break-before: always; break-before: page; }
+                </style>
+            </head>
+            <body>${conteudo}</body>
+            </html>
+        `);
+        
+        // Localiza a seção de descontos para aplicar a quebra de página
+        let docBody = iframe.contentWindow.document.body;
+        let h4s = docBody.getElementsByTagName('h4');
+        for (let h4 of h4s) {
+            if (h4.innerText.includes('DESCONTOS')) {
+                // Aplica a classe de quebra no container da seção de descontos
+                h4.parentElement.classList.add('quebra-pagina');
+                break; 
+            }
+        }
+        
+        doc.close();
 
-
-            <!-- ABA 4: PLANILHA DE DESEMPENHO -->
-            <section id="planilha" class="tab-content hidden space-y-6">
-                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b pb-2">
-                    <div>
-                        <h2 class="text-xl font-bold text-gray-800">Planilha Gerencial & Auditoria</h2>
-                    </div>
-                    
-                    <div class="flex items-center gap-2 bg-white p-2 rounded-xl shadow-sm border border-gray-200">
-                        <label class="text-xs font-bold text-gray-600 uppercase">Acessar Desempenho do Dia:</label>
-                        <input type="date" id="buscaPlanilhaData" onchange="atualizarPlanilhaFiltrada()" class="border p-1.5 rounded outline-none font-bold text-sm text-gray-700 focus:ring-2 focus:ring-blue-500">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-gray-800 text-white p-4 rounded-xl shadow-sm">
-                        <p class="text-xs text-gray-400 font-bold uppercase">Faturamento Bruto (Dia Escolhido)</p>
-                        <p id="planilha-fat-dia" class="text-xl font-bold">R$ 0,00</p>
-                    </div>
-                    <div class="bg-gray-800 text-white p-4 rounded-xl shadow-sm">
-                        <p class="text-xs text-gray-400 font-bold uppercase">Custo de Peças (Desconto)</p>
-                        <p id="planilha-custo-dia" class="text-xl font-bold text-red-400">R$ 0,00</p>
-                    </div>
-                    <div class="bg-blue-900 text-white p-4 rounded-xl shadow-sm">
-                        <p class="text-xs text-blue-300 font-bold uppercase">LUCRO REAL OBTIDO</p>
-                        <p id="planilha-lucro-dia" class="text-xl font-bold text-green-400">R$ 0,00</p>
-                    </div>
-                </div>
-
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 space-y-4">
-                    <div class="flex justify-between items-center flex-wrap gap-2">
-                        <h3 class="text-sm font-bold text-gray-700 uppercase">Histórico Técnico Total</h3>
-                        <button onclick="gerarRelatorioGerencial()" class="bg-gray-900 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-black transition">
-                            Imprimir Planilha de Lucros (PDF)
-                        </button>
-                    </div>
-                    
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs border-collapse">
-                            <thead>
-                                <tr class="bg-gray-100 border-b border-gray-300 font-bold text-gray-700 uppercase">
-                                    <th class="p-2">Data</th>
-                                    <th class="p-2">Cliente</th>
-                                    <th class="p-2">Aparelho</th>
-                                    <th class="p-2">Status</th>
-                                    <th class="p-2">Mão de Obra</th>
-                                    <th class="p-2">Custo Peça</th>
-                                    <th class="p-2">Total Bruto</th>
-                                    <th class="p-2 text-green-600">Lucro Real</th>
-                                </tr>
-                            </thead>
-                            <tbody id="corpoPlanilhaGeral" class="divide-y divide-gray-200"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
+        // Aguarda um momento para renderizar e imprime
+        setTimeout(() => {
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+            
+            // Remove o iframe da página após a impressão
+            setTimeout(() => { document.body.removeChild(iframe); }, 1000);
+        }, 500);
+    }
 
 
-            <!-- ABA 5: CALENDÁRIO DE GARANTIAS (3 MESES) -->
-            <section id="garantias" class="tab-content hidden space-y-6">
-                <h2 class="text-xl font-bold border-b pb-2 text-blue-600">Acompanhamento de Garantias</h2>
-                <p class="text-xs text-gray-500">Monitoramento automático baseado no prazo legal de *3 meses* para as ordens com status "Realizado / Concluído".</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="listaGarantias"></div>
-            </section>
 
+
+
+
+
+
+
+    function trocarAba(id, btn) { document.querySelectorAll('.aba-conteudo').forEach(a => a.classList.remove('active')); document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); btn.classList.add('active'); }
+
+    async function carregarDados() {
+        listaOS = []; listaComb = [];
+        const osSnap = await db.collection('minhasOS').get();
+        osSnap.forEach(doc => listaOS.push({id: doc.id, ...doc.data()}));
+        const combSnap = await db.collection('meuComb').get();
+        combSnap.forEach(doc => listaComb.push({id: doc.id, ...doc.data()}));
+        
+        const hoje = new Date();
+        const mesAtual = hoje.getUTCMonth();
+        const anoAtual = hoje.getUTCFullYear();
+        const diaAtual = hoje.getUTCDate();
+        
+        document.getElementById('anoRel').value = anoAtual;
+        document.getElementById('mesRel').value = mesAtual;
+        document.getElementById('filtroCicloRel').value = (diaAtual >= 26 || diaAtual <= 10) ? 'c1' : 'c2';
+        document.getElementById('anoPag').value = anoAtual;
+        document.getElementById('mesPag').value = mesAtual;
+        
+        renderTabelas(); 
+        gerarRelatorio();
+        calcularFechamentoTotal();
+    }
+
+    function renderTabelas(dadosOS = listaOS) {
+        const tbody = document.getElementById('tabelaOS'); tbody.innerHTML = '';
+        dadosOS.sort((a,b) => new Date(b.data) - new Date(a.data)).forEach(os => {
+            tbody.innerHTML += `<tr><td>${os.data}</td><td>${os.sa}</td><td>${os.cliente}</td><td>${os.servico}</td><td>R$ ${parseFloat(os.valorOS).toFixed(2)}</td>
+                <td>${os.foto1 ? `<button class="btn-ver" onclick="verFoto('${os.foto1}')">C</button>` : ''}
+                    ${os.foto2 ? `<button class="btn-ver" onclick="verFoto('${os.foto2}')">A</button>` : ''}</td>
+                <td><button class="btn-edit" onclick="editarOS('${os.id}')">E</button> <button class="btn-del" onclick="excluirOS('${os.id}')">X</button></td></tr>`;
+        });
+        const tbodyC = document.getElementById('tabelaComb'); tbodyC.innerHTML = '';
+        listaComb.sort((a,b) => new Date(a.data) - new Date(b.data)).forEach(c => {
+            tbodyC.innerHTML += `<tr><td>${c.data}</td><td>${c.km}</td><td>R$ ${c.valor.toFixed(2)}</td><td><button class="btn-del" onclick="excluirComb('${c.id}')">X</button></td></tr>`;
+        });
+    }
+
+    function gerarRelatorio() {
+        const ciclo = document.getElementById('filtroCicloRel').value;
+        const mesSel = parseInt(document.getElementById('mesRel').value);
+        const anoSel = parseInt(document.getElementById('anoRel').value);
+        const corpo = document.getElementById('corpoRelatorio'); 
+        const resumoMeta = document.getElementById('resumoMeta');
+        corpo.innerHTML = '';
+        
+        const proc = (dStr) => {
+            let d = new Date(dStr.replace(/-/g, '\/')), dia = d.getUTCDate(), mes = d.getUTCMonth(), ano = d.getUTCFullYear();
+            let mF = (dia >= 26) ? (mes === 11 ? 0 : mes + 1) : mes, aF = (dia >= 26 && mes === 11) ? ano + 1 : ano;
+            return { mF, aF, dia };
+        };
+
+        let dadosFiltrados = listaOS.filter(os => {
+            if (ciclo === 'todos') return true;
+            const {mF, aF, dia} = proc(os.data);
+            if (mF !== mesSel || aF !== anoSel) return false;
+            return (ciclo === 'c1') ? (dia >= 26 || dia <= 10) : (dia >= 11 && dia <= 25);
+        });
+        
+        const res = dadosFiltrados.reduce((acc, os) => { acc[os.data] = (acc[os.data] || 0) + 1; return acc; }, {});
+        const totalServicos = dadosFiltrados.length;
+        const diasTrabalhados = Object.keys(res).length;
+        const metaTotal = diasTrabalhados * 4;
+        const saldo = totalServicos - metaTotal;
+        
+        resumoMeta.innerHTML = `<div><strong>Dias:</strong> ${diasTrabalhados} | <strong>Meta:</strong> ${metaTotal} | <strong>Produção:</strong> ${totalServicos}</div>
+            <div style="color: ${saldo >= 0 ? 'green' : 'red'}; font-weight: bold;">${saldo >= 0 ? 'Meta batida: +' : 'Faltam: '} ${Math.abs(saldo)}</div>`;
+
+        Object.keys(res).sort().forEach(d => {
+            const estilo = res[d] < 4 ? 'style="color: red; font-weight: bold; background-color: #fff0f0;"' : 'style="color: green; font-weight: bold; background-color: #f0fff0;"';
+            corpo.innerHTML += `<tr ${estilo}><td>${d}</td><td>${res[d]}</td></tr>`;
+        });
+    }
+
+  function gerarHoleriteHTML(listaO, listaC, receita, gasto, dias, idConteudo, ehCiclo1, mesRef, anoRef) {
+    // Cálculo do período fixo do ciclo
+    let dataInicio, dataFim;
+    if (ehCiclo1) {
+        let mesAnterior = mesRef === 0 ? 11 : mesRef - 1;
+        let anoInicio = mesRef === 0 ? anoRef - 1 : anoRef;
+        dataInicio = new Date(anoInicio, mesAnterior, 26);
+        dataFim = new Date(anoRef, mesRef, 10);
+    } else {
+        dataInicio = new Date(anoRef, mesRef, 11);
+        dataFim = new Date(anoRef, mesRef, 25);
+    }
+    const formatar = (d) => `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+    const periodoTexto = `${formatar(dataInicio)} a ${formatar(dataFim)}`;
+
+    const resumoDiario = listaO.reduce((acc, o) => { acc[o.data] = (acc[o.data] || 0) + 1; return acc; }, {});
+
+    let html = `
+    <div id="${idConteudo}" style="padding: 10px; font-family: sans-serif;">
+        <div style="text-align: center; border-bottom: 2px solid #000; margin-bottom: 10px;">
+            <h3 style="margin: 5px 0;">DEMONSTRATIVO DE PAGAMENTO</h3>
+            <p style="margin: 2px 0;"><strong>Empresa:</strong> MHZ | <strong>Período:</strong> ${periodoTexto}</p>
+        </div>
+        
+        <div style="margin-bottom: 15px; font-size: 0.9em; border: 1px solid #ccc; padding: 10px; background: #f9f9f9;">
+            <p style="margin: 2px 0;"><strong>Técnico:</strong> João Vitor Lima dos Santos</p>
+            <p style="margin: 2px 0;"><strong>CPF:</strong> 472.131.928-25</p>
+            <p style="margin: 2px 0;"><strong>Data de Nascimento:</strong> 10/05/1997</p>
+        </div>
+
+        <div style="margin-bottom: 15px; font-size: 0.9em; border: 1px solid #000; padding: 10px; background: #fdfdfd;">
+            <p style="margin: 2px 0;"><strong>Dias Trabalhados:</strong> ${dias}</p>
+            <p style="margin: 2px 0;"><strong>Total de Serviços:</strong> ${listaO.length}</p>
+            <hr style="border: 0; border-top: 1px solid #ccc; margin: 8px 0;">
+            <p style="margin: 2px 0;"><strong>Receita:</strong> R$ ${receita.toFixed(2)}</p>
+            <p style="margin: 2px 0;"><strong>Gasto Combustível:</strong> - R$ ${gasto.toFixed(2)}</p>
+            <p style="margin: 5px 0 0 0; font-weight: bold; color: green; font-size: 1.1em;">VALOR LÍQUIDO: R$ ${(receita - gasto).toFixed(2)}</p>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <h4 style="margin: 5px 0; border-bottom: 1px solid #ccc;">RELATÓRIO DIÁRIO</h4>
+            <table style="width: 100%; font-size: 0.8em;">
+                <tr><th>Data</th><th>Qtd</th></tr>
+                ${Object.keys(resumoDiario).sort().map(d => `<tr><td>${d}</td><td style="text-align: right;">${resumoDiario[d]}</td></tr>`).join('')}
+            </table>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <h4 style="margin: 5px 0; border-bottom: 1px solid #ccc;">DESCONTOS (COMBUSTÍVEL)</h4>
+            <table style="width: 100%; font-size: 0.85em;">
+                ${listaC.map(c => `<tr><td>${c.data}</td><td style="text-align: right;">- R$ ${c.valor.toFixed(2)}</td></tr>`).join('')}
+                <tr style="border-top: 1px solid #000; font-weight: bold;"><td>TOTAL DESCONTOS</td><td style="text-align: right;">- R$ ${gasto.toFixed(2)}</td></tr>
+            </table>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <h4 style="margin: 5px 0; border-bottom: 1px solid #ccc;">PROVENTOS (GANHOS)</h4>
+            <table style="width: 100%; font-size: 0.85em;">
+                ${listaO.map(o => `<tr><td>OS ${o.sa} - ${o.servico}</td><td style="text-align: right;">R$ ${parseFloat(o.valorOS).toFixed(2)}</td></tr>`).join('')}
+                <tr style="border-top: 1px solid #000; font-weight: bold;"><td>TOTAL GANHOS</td><td style="text-align: right;">R$ ${receita.toFixed(2)}</td></tr>
+            </table>
         </div>
     </div>
-
-    <!-- JANELA MODAL: HISTÓRICO ESPECÍFICO DO CLIENTE -->
-    <div id="modalHistorico" class="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white w-full max-w-2xl rounded-2xl p-6 shadow-2xl flex flex-col max-h-[85vh]">
-            <div class="flex justify-between items-center border-b pb-3">
-                <div>
-                    <h3 id="modalNomeCliente" class="text-lg font-bold text-gray-900">Histórico do Cliente</h3>
-                    <p id="modalContratoCliente" class="text-xs text-gray-500"></p>
-                </div>
-                <button onclick="fecharModalHistorico()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
-            </div>
-            <div class="overflow-y-auto py-4 flex-1 space-y-3" id="modalListaServicos">
-                <!-- Preenchido via JavaScript -->
-            </div>
-            <div class="border-t pt-3 text-right">
-                <button onclick="fecharModalHistorico()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm">Fechar Janela</button>
-            </div>
-        </div>
-    </div>
+    <button class="btn-print" onclick="imprimirHolerite('${idConteudo}')">Imprimir / Salvar como PDF</button>`;
+    
+    return html;
+}
 
 
-    <!-- JAVASCRIPT LOGIC -->
-    <script>
-        let bancoClientes = JSON.parse(localStorage.getItem('jvcell_clientes')) || [];
-        let bancoOS = JSON.parse(localStorage.getItem('jvcell_os')) || [];
 
-        // Inicia datas no dia atual
-        const hojeIso = new Date().toISOString().split('T')[0];
-        document.getElementById('osData').value = hojeIso;
-        document.getElementById('buscaPlanilhaData').value = hojeIso;
+    function calcularFechamentoTotal() {
+        const mesRef = parseInt(document.getElementById('mesPag').value);
+        const anoRef = parseInt(document.getElementById('anoPag').value);
+        let c1OS = [], c2OS = [], c1Comb = [], c2Comb = [];
+        
+        const proc = (dStr) => {
+            let d = new Date(dStr.replace(/-/g, '\/')), dia = d.getUTCDate(), mes = d.getUTCMonth(), ano = d.getUTCFullYear();
+            let mF = (dia >= 26) ? (mes === 11 ? 0 : mes + 1) : mes, aF = (dia >= 26 && mes === 11) ? ano + 1 : ano;
+            return { mF, aF, dia };
+        };
 
-        // --- AUTENTICAÇÃO ---
-        function autenticar(e) {
-            e.preventDefault();
-            const usuario = document.getElementById('loginUser').value.trim();
-            const senha = document.getElementById('loginPassword').value;
-
-            if (usuario === "jvcell@gmail.com" && senha === "Aylla2605..") {
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('mainSystem').classList.remove('hidden');
-                sincronizarTudo();
-            } else {
-                const erroBox = document.getElementById('loginErro');
-                erroBox.classList.remove('hidden');
-                setTimeout(() => erroBox.classList.add('hidden'), 3000);
+        listaOS.forEach(os => { 
+            const {mF, aF, dia} = proc(os.data); 
+            if(mF === mesRef && aF === anoRef) {
+                (dia >= 11 && dia <= 25) ? c2OS.push(os) : c1OS.push(os); 
             }
-        }
+        });
 
-        function deslogar() {
-            document.getElementById('loginForm').reset();
-            document.getElementById('mainSystem').classList.add('hidden');
-            document.getElementById('loginScreen').classList.remove('hidden');
-        }
-
-        // --- NAVEGAÇÃO ---
-        function showSection(id) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-blue-800'));
-            
-            document.getElementById(id).classList.remove('hidden');
-            event.currentTarget.classList.add('bg-blue-800');
-
-            sincronizarTudo();
-        }
-
-        function sincronizarTudo() {
-            atualizarResumosHome();
-            renderizarClientes();
-            atualizarSelectClientes();
-            renderizarOS();
-            renderizarPlanilhaGeral();
-            atualizarPlanilhaFiltrada();
-            listarGarantias();
-        }
-
-        // --- CLIENTES ---
-        function salvarCliente(e) {
-            e.preventDefault();
-            const novo = {
-                id: Date.now(),
-                nome: document.getElementById('cNome').value.trim(),
-                telefone: document.getElementById('cTelefone').value.trim()
-            };
-            bancoClientes.push(novo);
-            localStorage.setItem('jvcell_clientes', JSON.stringify(bancoClientes));
-            document.getElementById('clienteForm').reset();
-            sincronizarTudo();
-        }
-
-        function deletarCliente(id) {
-            if(confirm('Remover este cliente e desvincular do banco?')) {
-                bancoClientes = bancoClientes.filter(c => c.id !== id);
-                localStorage.setItem('jvcell_clientes', JSON.stringify(bancoClientes));
-                sincronizarTudo();
+        listaComb.forEach(c => { 
+            const {mF, aF, dia} = proc(c.data); 
+            if(mF === mesRef && aF === anoRef) {
+                (dia >= 11 && dia <= 25) ? c2Comb.push(c) : c1Comb.push(c); 
             }
-        }
+        });
+        
+        const sumVal = (arr) => arr.reduce((a, b) => a + (parseFloat(b.valorOS) || 0), 0);
+        const sumComb = (arr) => arr.reduce((a, b) => a + (b.valor || 0), 0);
+        
+        // Cálculos do Ciclo 1 (26 a 10)
+        const setQ1 = new Set(c1OS.map(o=>o.data)).size;
+        document.getElementById('diasQ1').innerText = setQ1;
+        document.getElementById('resQ1').innerText = c1OS.length;
+        document.getElementById('valQ1').innerText = 'R$ ' + sumVal(c1OS).toFixed(2);
+        document.getElementById('combQ1').innerText = 'R$ ' + sumComb(c1Comb).toFixed(2);
+        document.getElementById('lucroQ1').innerText = 'R$ ' + (sumVal(c1OS) - sumComb(c1Comb)).toFixed(2);
+        
+        // Gerar Holerite Q1 (Passando os 9 parâmetros)
+        document.getElementById('detalhesQ1').innerHTML = gerarHoleriteHTML(c1OS, c1Comb, sumVal(c1OS), sumComb(c1Comb), setQ1, 'conteudoPDF1', true, mesRef, anoRef);
+        
+        // Cálculos do Ciclo 2 (11 a 25)
+        const setQ2 = new Set(c2OS.map(o=>o.data)).size;
+        document.getElementById('diasQ2').innerText = setQ2;
+        document.getElementById('resQ2').innerText = c2OS.length;
+        document.getElementById('valQ2').innerText = 'R$ ' + sumVal(c2OS).toFixed(2);
+        document.getElementById('combQ2').innerText = 'R$ ' + sumComb(c2Comb).toFixed(2);
+        document.getElementById('lucroQ2').innerText = 'R$ ' + (sumVal(c2OS) - sumComb(c2Comb)).toFixed(2);
+        
+        // Gerar Holerite Q2 (Passando os 9 parâmetros)
+        document.getElementById('detalhesQ2').innerHTML = gerarHoleriteHTML(c2OS, c2Comb, sumVal(c2OS), sumComb(c2Comb), setQ2, 'conteudoPDF2', false, mesRef, anoRef);
+        
+        document.getElementById('resultadoPag').style.display = 'block';
+    }
 
-        function renderizarClientes() {
-            const tbody = document.getElementById('tabelaClientes');
-            tbody.innerHTML = '';
-            bancoClientes.forEach(c => {
-                // Conta quantos serviços esse cliente específico tem registrado
-                const qtdServicos = bancoOS.filter(o => o.cliente === c.nome).length;
-                const badgeServicos = qtdServicos > 0 ? <span class="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full font-black text-xs">${qtdServicos} O.S.</span> : '';
 
-                tbody.innerHTML += `
-                    <tr class="hover:bg-blue-50/50 transition">
-                        <td class="p-3 font-bold text-blue-700 cursor-pointer underline decoration-dotted" onclick="abrirModalHistorico('${c.nome}', '${c.telefone}')">
-                            ${c.nome} ${badgeServicos}
-                        </td>
-                        <td class="p-3 text-gray-600">${c.telefone}</td>
-                        <td class="p-3 text-center">
-                            <button onclick="deletarCliente(${c.id})" class="text-xs bg-red-100 text-red-600 font-bold px-2 py-1 rounded hover:bg-red-200">Excluir</button>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-
-        function atualizarSelectClientes() {
-            const select = document.getElementById('osCliente');
-            select.innerHTML = '<option value="">-- Escolha --</option>';
-            bancoClientes.forEach(c => {
-                select.innerHTML += <option value="${c.nome}" data-tel="${c.telefone}">${c.nome}</option>;
-            });
-        }
-
-        // --- DETALHAMENTO DE HISTÓRICO MULTI-SERVIÇOS (MODAL) ---
-        function abrirModalHistorico(nomeCliente, telefone) {
-            document.getElementById('modalNomeCliente').innerText = Histórico Técnico: ${nomeCliente};
-            document.getElementById('modalContratoCliente').innerText = Contato Cadastrado: ${telefone};
-            
-            const container = document.getElementById('modalListaServicos');
-            container.innerHTML = '';
-
-            const servicosDesteCliente = bancoOS.filter(o => o.cliente === nomeCliente);
-
-            if(servicosDesteCliente.length === 0) {
-                container.innerHTML = <p class="text-sm text-gray-500 text-center py-4">Nenhum serviço registrado ainda para este cliente.</p>;
-            } else {
-                servicosDesteCliente.forEach((o, index) => {
-                    const total = o.maoObra + o.peca;
-                    container.innerHTML += `
-                        <div class="p-4 border border-gray-200 rounded-xl bg-gray-50 space-y-1">
-                            <div class="flex justify-between items-center text-xs font-bold text-gray-400">
-                                <span>#${index + 1} - Entrada em ${o.data.split('-').reverse().join('/')}</span>
-                                <span class="px-2 py-0.5 rounded ${o.status === 'Realizado' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">${o.status}</span>
-                            </div>
-                            <p class="text-sm font-bold text-gray-800"><span class="text-gray-400 font-medium">Aparelho:</span> ${o.aparelho}</p>
-                            <p class="text-sm text-gray-600"><span class="text-gray-400 font-medium">Serviço:</span> ${o.servico}</p>
-                            <div class="pt-2 text-xs flex justify-between border-t border-gray-200 text-gray-500">
-                                <span>Mão de Obra: R$ ${o.maoObra.toFixed(2)}</span>
-                                <span>Peça: R$ ${o.peca.toFixed(2)}</span>
-                                <span class="font-bold text-gray-700">Total: R$ ${total.toFixed(2)}</span>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-
-            document.getElementById('modalHistorico').classList.remove('hidden');
-        }
-
-        function fecharModalHistorico() {
-            document.getElementById('modalHistorico').classList.add('hidden');
-        }
-
-        // --- ORDENS DE SERVIÇO ---
-        function salvarOS(e) {
-            e.preventDefault();
-            const selectEl = document.getElementById('osCliente');
-            const tel = selectEl.options[selectEl.selectedIndex].getAttribute('data-tel') || '';
-
-            const novaOS = {
-                id: Date.now(),
-                cliente: selectEl.value,
-                telefone: tel,
-                aparelho: document.getElementById('osAparelho').value,
-                servico: document.getElementById('osServico').value,
-                maoObra: parseFloat(document.getElementById('osMaoObra').value) || 0,
-                peca: parseFloat(document.getElementById('osPeca').value) || 0,
-                status: document.getElementById('osStatus').value,
-                data: document.getElementById('osData').value
-            };
-
-            bancoOS.push(novaOS);
-            localStorage.setItem('jvcell_os', JSON.stringify(bancoOS));
-            document.getElementById('osForm').reset();
-            document.getElementById('osData').value = hojeIso;
-            sincronizarTudo();
-            alert('Ordem de Serviço registrada com sucesso!');
-        }
-
-        function mudarStatus(id, novoStatus) {
-            bancoOS = bancoOS.map(o => {
-                if(o.id === id) o.status = novoStatus;
-                return o;
-            });
-            localStorage.setItem('jvcell_os', JSON.stringify(bancoOS));
-            sincronizarTudo();
-        }
-
-        // --- DELETAR ORDEM DE SERVIÇO ---
-        function deletarOS(id) {
-            if(confirm('Deseja excluir permanentemente este registro de serviço?')) {
-                bancoOS = bancoOS.filter(o => o.id !== id);
-                localStorage.setItem('jvcell_os', JSON.stringify(bancoOS));
-                sincronizarTudo();
-            }
-        }
-
-        function renderizarOS() {
-            const tbody = document.getElementById('tabelaOS');
-            tbody.innerHTML = '';
-
-            bancoOS.forEach(o => {
-                const total = o.maoObra + o.peca;
-                tbody.innerHTML += `
-                    <tr class="hover:bg-gray-50">
-                        <td class="p-3 font-bold text-gray-900">${o.cliente}</td>
-                        <td class="p-3 text-gray-600">
-                            <p class="font-semibold text-gray-800">${o.aparelho}</p>
-                            <p class="text-xs text-gray-400">${o.servico}</p>
-                        </td>
-                        <td class="p-3">
-                            <select onchange="mudarStatus(${o.id}, this.value)" class="p-1 text-xs border rounded bg-white font-semibold outline-none">
-                                <option value="Orçamento" ${o.status === 'Orçamento' ? 'selected' : ''}>Orçamento</option>
-                                <option value="Aprovado" ${o.status === 'Aprovado' ? 'selected' : ''}>Aprovado</option>
-                                <option value="Realizado" ${o.status === 'Realizado' ? 'selected' : ''}>Realizado / Concluído</option>
-                            </select>
-                        </td>
-                        <td class="p-3 font-bold text-gray-700">R$ ${total.toFixed(2)}</td>
-                        <td class="p-3 text-center space-x-1 whitespace-nowrap">
-                            <button onclick="gerarReciboCliente(${o.id})" class="text-xs bg-blue-600 text-white px-2 py-1 rounded font-bold hover:bg-blue-700">Recibo Cliente</button>
-                            <button onclick="deletarOS(${o.id})" class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded font-bold hover:bg-red-200">Excluir</button>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-
-        // --- PLANILHA E DESEMPENHO ---
-        function renderizarPlanilhaGeral() {
-            const tbody = document.getElementById('corpoPlanilhaGeral');
-            tbody.innerHTML = '';
-            bancoOS.forEach(o => {
-                const total = o.maoObra + o.peca;
-                tbody.innerHTML += `
-                    <tr class="hover:bg-gray-50 text-gray-700">
-                        <td class="p-2 text-gray-400">${o.data.split('-').reverse().join('/')}</td>
-                        <td class="p-2 font-bold text-gray-900">${o.cliente}</td>
-                        <td class="p-2">${o.aparelho}</td>
-                        <td class="p-2"><span class="px-1.5 py-0.5 text-[10px] rounded font-bold ${o.status === 'Realizado' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">${o.status}</span></td>
-                        <td class="p-2">R$ ${o.maoObra.toFixed(2)}</td>
-                        <td class="p-2 text-red-500">R$ ${o.peca.toFixed(2)}</td>
-                        <td class="p-2 font-black text-gray-800">R$ ${total.toFixed(2)}</td>
-                        <td class="p-2 text-green-600 font-bold">R$ ${o.maoObra.toFixed(2)}</td>
-                    </tr>
-                `;
-            });
-        }
-
-        function atualizarPlanilhaFiltrada() {
-            const dataFiltro = document.getElementById('buscaPlanilhaData').value;
-            const itensDoDia = bancoOS.filter(o => o.data === dataFiltro);
-
-            let fatDia = 0, custoDia = 0;
-            itensDoDia.forEach(o => {
-                fatDia += (o.maoObra + o.peca);
-                custoDia += o.peca;
-            });
-
-            document.getElementById('planilha-fat-dia').innerText = R$ ${fatDia.toFixed(2)};
-            document.getElementById('planilha-custo-dia').innerText = R$ ${custoDia.toFixed(2)};
-            document.getElementById('planilha-lucro-dia').innerText = R$ ${(fatDia - custoDia).toFixed(2)};
-        }
-
-        // --- PDF COMPROVANTE DO CLIENTE (NÃO MOSTRAR CUSTO DE PEÇAS OU MÃO DE OBRA SEPARADAS) ---
-        function gerarReciboCliente(id) {
-            const o = bancoOS.find(item => item.id === id);
-            if(!o) return;
-
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            const total = o.maoObra + o.peca;
-
-            doc.setFont("Helvetica", "bold");
-            doc.setFontSize(22);
-            doc.text("JV CELL - ASSISTÊNCIA TÉCNICA", 20, 25);
-            
-            doc.setFontSize(10);
-            doc.setFont("Helvetica", "normal");
-            doc.text("Reparos de Precisão e Manutenção Especializada", 20, 32);
-            doc.text(Emissão: ${new Date().toLocaleDateString('pt-BR')}, 20, 37);
-            doc.line(20, 42, 190, 42);
-
-            doc.setFontSize(12);
-            doc.setFont("Helvetica", "bold");
-            doc.text("COMPROVANTE DE ENTREGA / ORDEM DE SERVIÇO", 20, 52);
-
-            doc.setFont("Helvetica", "normal");
-            doc.text(Cliente: ${o.cliente}, 20, 62);
-            doc.text(Contato: ${o.telefone || 'Não Informado'}, 20, 70);
-            doc.text(Equipamento: ${o.aparelho}, 20, 78);
-            doc.text(Serviço Executado: ${o.servico}, 20, 86);
-            doc.text(Data: ${o.data.split('-').reverse().join('/')}, 20, 94);
-            doc.line(20, 102, 190, 102);
-
-            // REGRA: Sem valores de peça ou mão de obra individualizados para o cliente final.
-            doc.setFontSize(14);
-            doc.setFont("Helvetica", "bold");
-            doc.text(VALOR TOTAL CONCLUÍDO: R$ ${total.toFixed(2)}, 20, 120);
-
-            doc.line(20, 130, 190, 130);
-            doc.setFontSize(9);
-            doc.setFont("Helvetica", "italic");
-            doc.text("Termos de Garantia: Cobertura legal de 3 meses (90 dias) exclusiva sobre o reparo efetuado.", 20, 140);
-            doc.text("A garantia perde a validade em casos de quedas, trincados, umidade ou selos rompidos.", 20, 145);
-
-            doc.line(20, 190, 90, 190);
-            doc.text("Assinatura Técnica", 25, 195);
-            doc.line(120, 190, 190, 190);
-            doc.text("Assinatura do Cliente", 130, 195);
-
-            doc.save(Recibo_JVCELL_${o.cliente.replace(/\s+/g, '_')}.pdf);
-        }
-
-        // --- PDF PLANILHA INTERNA COMPLETA (MOSTRA CUSTO DE PEÇAS E CALCULA LUCRO REAL) ---
-        function gerarRelatorioGerencial() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            doc.setFont("Helvetica", "bold");
-            doc.text("BALANÇO FINANCEIRO DE DESEMPENHO - JV CELL", 20, 20);
-            doc.setFontSize(10);
-            doc.setFont("Helvetica", "normal");
-            doc.text(Planilha emitida em: ${new Date().toLocaleString('pt-BR')}, 20, 27);
-            doc.line(20, 32, 190, 32);
-
-            let y = 42;
-            let brutoTotal = 0, pecasTotal = 0, lucroTotal = 0;
-
-            doc.setFont("Helvetica", "bold");
-            doc.text("Cliente / Equipamento", 20, y);
-            doc.text("Bruto", 125, y);
-            doc.text("Custo Peça", 150, y);
-            doc.text("Lucro Real", 173, y);
-            y += 8;
-            doc.line(20, y-4, 190, y-4);
-
-            doc.setFont("Helvetica", "normal");
-            bancoOS.forEach(o => {
-                const totalItem = o.maoObra + o.peca;
-                const lucroItem = o.maoObra; // Mão de obra limpa = Lucro
-
-                brutoTotal += totalItem;
-                pecasTotal += o.peca;
-                lucroTotal += lucroItem;
-
-                if(y > 270) { doc.addPage(); y = 20; }
-                doc.text(${o.cliente} (${o.aparelho.substring(0,18)}), 20, y);
-                doc.text(R$ ${totalItem.toFixed(2)}, 125, y);
-                doc.text(R$ ${o.peca.toFixed(2)}, 150, y);
-                doc.text(R$ ${lucroItem.toFixed(2)}, 173, y);
-                y += 8;
-            });
-
-            doc.line(20, y, 190, y);
-            y += 10;
-            doc.setFont("Helvetica", "bold");
-            doc.text(Faturamento Geral Bruto: R$ ${brutoTotal.toFixed(2)}, 20, y);
-            doc.text(Custo Descontado em Peças: R$ ${pecasTotal.toFixed(2)}, 20, y+6);
-            doc.text(LUCRO REAL LÍQUIDO CONSOLIDADO: R$ ${lucroTotal.toFixed(2)}, 20, y+12);
-
-            doc.save("Planilha_Financeira_JVCELL.pdf");
-        }
-
-        // --- CALENDÁRIO DE GARANTIAS ---
-        function listarGarantias() {
-            const container = document.getElementById('listaGarantias');
-            container.innerHTML = '';
-            const concluidos = bancoOS.filter(o => o.status === 'Realizado');
-
-            if(concluidos.length === 0) {
-                container.innerHTML = '<p class="text-sm text-gray-400 col-span-3 font-medium">Nenhum aparelho concluído com garantia ativa.</p>';
-                return;
-            }
-
-            concluidos.forEach(o => {
-                const dataBase = new Date(o.data + 'T00:00:00');
-                dataBase.setMonth(dataBase.getMonth() + 3); // Prorroga 3 meses exatos
-
-                const hoje = new Date();
-                const restam = Math.ceil((dataBase - hoje) / (1000 * 60 * 60 * 24));
-                
-                let corCard = 'border-green-200 bg-green-50 text-green-800';
-                let txt = ${restam} Dias Restantes;
-
-                if(restam <= 0) {
-                    corCard = 'border-red-200 bg-red-50 text-red-800';
-                    txt = 'Garantia Expirada';
-                } else if(restam <= 15) {
-                    corCard = 'border-amber-200 bg-amber-50 text-amber-800';
-                }
-
-                container.innerHTML += `
-                    <div class="p-4 border rounded-xl shadow-sm ${corCard} flex flex-col justify-between">
-                        <div>
-                            <h4 class="font-bold text-gray-900">${o.cliente}</h4>
-                            <p class="text-xs text-gray-700">Celular: ${o.aparelho}</p>
-                            <p class="text-[11px] text-gray-500 mt-1">Expira em: ${dataBase.toLocaleDateString('pt-BR')}</p>
-                        </div>
-                        <div class="text-right mt-2">
-                            <span class="text-[10px] font-black uppercase px-2 py-0.5 border border-current rounded">${txt}</span>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        // --- DASHBOARD AUTOMÁTICO E GRÁFICOS ---
-        let dChart = null;
-        let mChart = null;
-
-        function atualizarResumosHome() {
-            const itensHoje = bancoOS.filter(o => o.data === hojeIso);
-
-            let fat = 0, pecas = 0;
-            itensHoje.forEach(o => {
-                fat += (o.maoObra + o.peca);
-                pecas += o.peca;
-            });
-
-            document.getElementById('fat-hoje').innerText = R$ ${fat.toFixed(2)};
-            document.getElementById('custo-hoje').innerText = R$ ${pecas.toFixed(2)};
-            document.getElementById('lucro-hoje').innerText = R$ ${(fat - pecas).toFixed(2)};
-
-            gerarGraficos();
-        }
-
-        function gerarGraficos() {
-            const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-            const ultimos7Dias = Array.from({length: 7}, (_, i) => {
-                const d = new Date(); d.setDate(d.getDate() - i); return d.toISOString().split('T')[0];
-            }).reverse();
-
-            const faturamentosDiarios = ultimos7Dias.map(dt => bancoOS.filter(o => o.data === dt).reduce((a, b) => a + (b.maoObra + b.peca), 0));
-            const labelsDias = ultimos7Dias.map(dt => { const d = new Date(dt + 'T00:00:00'); return ${diasSemana[d.getDay()]} (${d.getDate()}/${d.getMonth()+1}); });
-
-            if(dChart) dChart.destroy();
-            if(mChart) mChart.destroy();
-
-            dChart = new Chart(document.getElementById('chartDiario').getContext('2d'), {
-                type: 'bar',
-                data: { labels: labelsDias, datasets: [{ label: 'Bruto R$', data: faturamentosDiarios, backgroundColor: '#2563eb', borderRadius: 5 }] },
-                options: { responsive: true }
-            });
-
-            const listaMeses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-            const faturamentosMensais = Array(12).fill(0);
-            bancoOS.forEach(o => { const m = new Date(o.data + 'T00:00:00').getMonth(); faturamentosMensais[m] += (o.maoObra + o.peca); });
-
-            mChart = new Chart(document.getElementById('chartMensal').getContext('2d'), {
-                type: 'line',
-                data: { labels: listaMeses, datasets: [{ label: 'Mensal R$', data: faturamentosMensais, borderColor: '#16a34a', backgroundColor: 'rgba(22, 163, 74, 0.05)', fill: true, tension: 0.15 }] },
-                options: { responsive: true }
-            });
-        }
-    </script>
+    async function salvarOS() { 
+        const id = document.getElementById('editIndex').value; 
+        const os = { sa: document.getElementById('sa').value, cliente: document.getElementById('cliente').value, servico: document.getElementById('servico').value, valorOS: document.getElementById('valorOS').value, data: document.getElementById('data').value, foto1: await lerArquivo('fotoCasa'), foto2: await lerArquivo('fotoAparelho') }; 
+        if(!os.sa || !os.data) return alert("Preencha SA e Data!"); 
+        id ? await db.collection('minhasOS').doc(id).update(os) : await db.collection('minhasOS').add(os); 
+        alert("Salvo com sucesso!");
+        limparForm(); 
+        carregarDados(); 
+    }
+    async function salvarCombustivel() { 
+        const c = { data: document.getElementById('dataComb').value, km: parseInt(document.getElementById('kmComb').value), valor: parseFloat(document.getElementById('valorComb').value) || 0 }; 
+        await db.collection('meuComb').add(c); 
+        alert("Salvo com sucesso!");
+        carregarDados(); 
+    }
+    async function excluirOS(id) { if(confirm("Excluir?")) { await db.collection('minhasOS').doc(id).delete(); alert("Excluído com sucesso!"); carregarDados(); } }
+    async function excluirComb(id) { if(confirm("Excluir?")) { await db.collection('meuComb').doc(id).delete(); alert("Excluído com sucesso!"); carregarDados(); } }
+    function editarOS(id) { 
+        const os = listaOS.find(o => o.id === id); 
+        document.getElementById('sa').value = os.sa; 
+        document.getElementById('cliente').value = os.cliente; 
+        document.getElementById('servico').value = os.servico; 
+        document.getElementById('valorOS').value = os.valorOS; 
+        document.getElementById('data').value = os.data; 
+        document.getElementById('editIndex').value = id; 
+        document.getElementById('btnSalvar').innerText = "Atualizar"; 
+        window.scrollTo(0, 0);
+    }
+    function pesquisarSA() { const t = document.getElementById('buscaSA').value.toLowerCase(); renderTabelas(listaOS.filter(os => os.sa.toLowerCase().includes(t))); }
+    function limparForm() { document.getElementById('editIndex').value = ''; document.getElementById('sa').value = ''; document.getElementById('cliente').value = ''; document.getElementById('servico').value = ''; document.getElementById('valorOS').value = '70.00'; document.getElementById('btnSalvar').innerText = "Salvar Serviço"; }
+    async function lerArquivo(id) { const f = document.getElementById(id).files[0]; if(!f) return null; return new Promise(r => { const reader = new FileReader(); reader.onload = e => r(e.target.result); reader.readAsDataURL(f); }); }
+    function verFoto(src) { document.getElementById('imgVisualizar').src = src; document.getElementById('modalFoto').style.display = 'flex'; }
+    function toggleDetalhes(id) { const el = document.getElementById(id); el.style.display = el.style.display === 'none' ? 'block' : 'none'; }
+    carregarDados();
+</script>
 </body>
 </html>
+
+Meu codigo esta assim quero q no holerite quero que o desconto apareca antes do proventos
